@@ -208,7 +208,7 @@ server <- function(input, output) {
         support <- 4/dim(tr)[1]
         
         rules <- apriori(data = tr,
-                         parameter = list(supp=0.0001, conf=.02, minlen = 3),
+                         parameter = list(supp=0.0001, conf=input$conf, minlen = 3),
                          control = list(verbose = FALSE))
         
         rules <- rules[is.maximal(rules)]
@@ -225,7 +225,7 @@ server <- function(input, output) {
         
         support <- 4/dim(tr)[1]
         rules <- apriori(data = tr, 
-                         parameter = list(supp=support, conf=.02, maxlen = 2),
+                         parameter = list(supp=support, conf=input$conf, maxlen = 2),
                          control = list(verbose = FALSE))
         
         top.count <- sort(rules, by="count", decreasing=T)
