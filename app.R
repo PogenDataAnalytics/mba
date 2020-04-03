@@ -10,6 +10,9 @@ library(ggpubr)
 library(ggplot2)
 library(plyr)
 library(DT)
+library(htmlwidgets)
+library(htmltools)
+
 
 options(shiny.maxRequestSize=30*1024^2)
 
@@ -49,7 +52,7 @@ ui <- fluidPage(
                            tabPanel(
                                title = "Análisis",
                                plotOutput("freq", width = "100%"),
-                               plotOutput("grafo", width = "100%"),
+                               visNetwork::visNetworkOutput("grafo"),
                                dataTableOutput("rules"))
 
                         )
@@ -123,7 +126,7 @@ server <- function(input, output) {
         DT::datatable(data)
     })
    
-   file <- reactive({
+   file_basket <- reactive({
         data <- df_upload()
         data <- data%>%
             select(input$select_ticket_col, input$select_art_col)
@@ -132,7 +135,7 @@ server <- function(input, output) {
    
     output$freq <- renderPlot({
                 
-                data <- file()
+                data <- file_basket()
                 names(data) <- c("ticket","items")
                 
                 freq <- data.frame(table(data$items)) 
@@ -173,12 +176,9 @@ server <- function(input, output) {
                 
                 })
         
-        
-}
-
     tr <- reactive({
         
-        data <- file()
+        data <- file_basket()
         names(data) <- c("ticket","items")
         
         data <- data[complete.cases(data),]
@@ -201,7 +201,7 @@ server <- function(input, output) {
         
     })
     
-    output$grafo <- renderPlot({
+    output$grafo <- visNetwork::renderVisNetwork({
         
         tr <- tr()
         
@@ -249,6 +249,8 @@ server <- function(input, output) {
             formatPercentage(columns = "% Conf", digits = 1)
         
     })
+}
+                   
 # Run the application 
 shinyApp(ui = ui, server = server)
 
