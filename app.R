@@ -11,6 +11,8 @@ library(ggplot2)
 library(plyr)
 library(DT)
 
+options(shiny.maxRequestSize=30*1024^2)
+
 # Define UI for application that draws a histogram
 ui <- fluidPage(
    
@@ -21,51 +23,117 @@ ui <- fluidPage(
         sidebarLayout(
                 
                 sidebarPanel(
-                        fileInput("data",
-                                  "Selecciona tu archivo:",
-                                  multiple = F,
-                                  accept = c(".csv", ".xlsx", ".xlsm", ".xls")),
-                        
-                         sliderInput("conf",
+                        radioButtons(inputId = "file_type",label = "Selecciona el tipo de archivo a cargar",choices = c(Excel = "xls",CSV.file = "csv")),
+                        uiOutput(outputId = "read_file"),
+                        uiOutput(outputId = "tickets_col"),
+                        uiOutput(outputId = "art_col"),
+                        sliderInput("conf",
                                     "Confidence:",
-                                  min = 0,
-                                  max = 0.1,
-                                  value = .01,
-                                  step = .01),
-                        
-                        sliderInput("supp",
-                                    "Support:",
                                     min = 0,
-                                    max = 0.001,
-                                    value = .0001,
-                                    step = .0001),
+                                    max = 0.1,
+                                    value = .01,
+                                    step = .01)
                 ),
                 
                 mainPanel(
-                        plotOutput("freq", width = "100%")
+                        tabsetPanel(
+                           type = "tabs",
+                           tabPanel(
+                               title = "Previsualización",
+                               tabsetPanel(
+                                    type = "tabs",
+                                    tabPanel(title = "Tabla Cargada",DT::dataTableOutput(outputId = "datacsv")),
+                                    tabPanel(title = "Seleccionados",DT::dataTableOutput(outputId = "basket_file"))
+                                )
+                           ),
+                           tabPanel(
+                               title = "Análisis",
+                               plotOutput("freq", width = "100%"),
+                               plotOutput("grafo", width = "100%"),
+                               dataTableOutput("rules"))
+
                         )
-        ),
-   
-   plotOutput("grafo", width = "100%"),
-    
-   dataTableOutput("rules"),
-   
+                  )
+        )
 )
 
 # SERVER
 server <- function(input, output) {
+  
+   output$read_file <- renderUI({
+        if (input$file_type == "csv") {
+            fileInput(inputId = "basket",
+                      label = "Selecciona el archivo .csv basket",
+                      accept = c(
+                          'text/csv',
+                          'text/comma-separated-values',
+                          '.csv')
+                      )
+        }else{
+            fileInput(inputId = 'basket', 
+                      label = 'Selecciona el archivo .xls basket',
+                      accept = c(".xlsx",
+                                 ".xls")
+                      )
+        }
+    })
+    
+    
+    df_upload <- reactive({
+        inFile <- input$basket
+        if (input$file_type == "csv") {
+            if(is.null(inFile))
+                return(NULL)
+            df <- read.csv(inFile$datapath,header = TRUE,sep = ",")
+            
+        }else{
+            if(is.null(inFile))
+                return(NULL)
+            df <- read_excel(path = inFile$datapath)
+        }
+    return(df)
+    })
+    
+    output$datacsv <- DT::renderDataTable({
+            data <- df_upload()
+            DT::datatable(data)
+        })
+
+    output$tickets_col <- reactive({
+        names(df_upload())
+    })
+    
+
+    output$tickets_col <- renderUI({
+        selectInput(inputId = "select_ticket_col",
+                    label = "Selecciona la columna que contiene los tickets",
+                    choices = names(df_upload()))
+    })
+    
+    output$art_col <- renderUI({
+        selectInput(inputId = "select_art_col",
+                    label = "Selecciona la columna que contiene los artículos",
+                    choices = names(df_upload()))
+    })
+    
+    output$basket_file <- DT::renderDataTable({
+        data <- df_upload()
+        data <- data%>%
+            select(input$select_ticket_col, input$select_art_col)
+        DT::datatable(data)
+    })
+   
+   file <- reactive({
+        data <- df_upload()
+        data <- data%>%
+            select(input$select_ticket_col, input$select_art_col)
+        as.data.frame(data)
+    })
    
     output$freq <- renderPlot({
                 
-                ## Los datos usados a continuación debería de ser tomada del selectInput del archivo que
-                ## el cliente cargó e indicó las columnas Por lo pronto
-                ## yo leí el archivo directamente
-                
-                data <- read.csv(file = "Pavel/investigaciones/mba-master/tabla.csv")
+                data <- file()
                 names(data) <- c("ticket","items")
-                
-                ## Gráfico de frecuencia de ITEMS 
-                ## Aquí debería de iniciar con un table(input$items)
                 
                 freq <- data.frame(table(data$items)) 
                 freq <- freq[order(freq$Freq, decreasing = T),]
@@ -104,17 +172,14 @@ server <- function(input, output) {
                 ggarrange(trans, ticket , ncol = 2, nrow = 1, align = "v", widths = c(2,1))
                 
                 })
+        
+        
+}
+
     tr <- reactive({
         
-        ## Como primer paso se debería de combinar las columnas de ticket e item
-        ## que el cliente seleccionó en la primera parte para generar una tabla
-        ## y después ser tratada para el análisis. En este momento leeré la tabla
-        ## con la que estamos trabajando
-        
-        data <- read.csv(file = "tabla.csv")
+        data <- file()
         names(data) <- c("ticket","items")
-        
-        ##Comienza el proceso
         
         data <- data[complete.cases(data),]
         data$ticket <- as.character(data$ticket)
@@ -130,9 +195,9 @@ server <- function(input, output) {
                     quote = FALSE)
         
         read.transactions(file = tmp_cu,
-                                format = "basket",
-                                sep = ",", 
-                                rm.duplicates=TRUE)
+                          format = "basket",
+                          sep = ",", 
+                          rm.duplicates=TRUE)
         
     })
     
@@ -184,9 +249,6 @@ server <- function(input, output) {
             formatPercentage(columns = "% Conf", digits = 1)
         
     })
-        
-}
-
 # Run the application 
 shinyApp(ui = ui, server = server)
 
