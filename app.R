@@ -10,60 +10,46 @@ library(ggpubr)
 library(ggplot2)
 library(plyr)
 library(DT)
-library(htmlwidgets)
-library(htmltools)
-
+library(tidyverse)
+library(readxl)
 
 options(shiny.maxRequestSize=30*1024^2)
-
 # Define UI for application that draws a histogram
 ui <- fluidPage(
-   
-   # Application title
-        titlePanel("Market Basket Analysis"),
-        
-        # Sidebar with a slider input for number of bins 
-        sidebarLayout(
-                
-                sidebarPanel(
-                        radioButtons(inputId = "file_type",label = "Selecciona el tipo de archivo a cargar",choices = c(Excel = "xls",CSV.file = "csv")),
-                        uiOutput(outputId = "read_file"),
-                        uiOutput(outputId = "tickets_col"),
-                        uiOutput(outputId = "art_col"),
-                        sliderInput("conf",
-                                    "Confidence:",
-                                    min = 0,
-                                    max = 0.1,
-                                    value = .01,
-                                    step = .01)
+
+    # Application title
+    titlePanel("Aplicación Basket"),
+    tabsetPanel(type = "tabs",
+                tabPanel(title = "Paso 1. Carga de archivos", 
+                         
+                         sidebarPanel(radioButtons(inputId = "file_type",
+                                                   label = "Selecciona el tipo de archivo a cargar",
+                                                   choices = c(Excel = "xls",
+                                                               csv.file = "csv"),
+                                                   selected = "csv"),
+                                      uiOutput(outputId = "read_file"),
+                                      uiOutput(outputId = "tickets_col"),
+                                      uiOutput(outputId = "art_col"), width = 2
+                         ),
+                         mainPanel(DT::dataTableOutput(outputId = "basket_file"),width = 5)
+                         
+                         
                 ),
                 
-                mainPanel(
-                        tabsetPanel(
-                           type = "tabs",
-                           tabPanel(
-                               title = "Previsualización",
-                               tabsetPanel(
-                                    type = "tabs",
-                                    tabPanel(title = "Tabla Cargada",DT::dataTableOutput(outputId = "datacsv")),
-                                    tabPanel(title = "Seleccionados",DT::dataTableOutput(outputId = "basket_file"))
-                                )
-                           ),
-                           tabPanel(
-                               title = "Análisis",
-                               plotOutput("freq", width = "100%"),
-                               visNetwork::visNetworkOutput("grafo"),
-                               dataTableOutput("rules"))
-
-                        )
-                  )
-        )
+                tabPanel(title = "Paso 2. Análisis",
+                        plotOutput("freq", width = "100%"),
+                        visNetwork::visNetworkOutput(outputId = "grafo"),
+                        dataTableOutput("rules")
+                ),
+                
+                tabPanel(title = "Paso 3: Recomendaciones")
+                
+    )
 )
-
-# SERVER
+# Define server logic required to draw a histogram
 server <- function(input, output) {
-  
-   output$read_file <- renderUI({
+    
+    output$read_file <- renderUI({
         if (input$file_type == "csv") {
             fileInput(inputId = "basket",
                       label = "Selecciona el archivo .csv basket",
@@ -96,15 +82,9 @@ server <- function(input, output) {
         }
     return(df)
     })
-    
-    output$datacsv <- DT::renderDataTable({
-            data <- df_upload()
-            DT::datatable(data)
-        })
 
-    output$tickets_col <- reactive({
-        names(df_upload())
-    })
+
+
     
 
     output$tickets_col <- renderUI({
@@ -125,63 +105,73 @@ server <- function(input, output) {
             select(input$select_ticket_col, input$select_art_col)
         DT::datatable(data)
     })
-   
-   file_basket <- reactive({
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    file_t <- reactive({
         data <- df_upload()
         data <- data%>%
             select(input$select_ticket_col, input$select_art_col)
-        as.data.frame(data)
+        data <- as.data.frame(data)
+        
+        data
     })
-   
+    
+    
     output$freq <- renderPlot({
-                
-                data <- file_basket()
-                names(data) <- c("ticket","items")
-                
-                freq <- data.frame(table(data$items)) 
-                freq <- freq[order(freq$Freq, decreasing = T),]
-                total <- sum(freq$Freq)
-                freq <- freq[1:10,]
-                names(freq) <- c("items","count")
-                relativo <- c(rel = round(freq$count/total,4))
-                
-                g <- ggplot(freq, aes(x= reorder(items, -count), y = count))
-                
-                trans <- g + geom_bar(fill="#F5CFDC", stat="identity")+
-                        geom_text(aes(label=paste(relativo*100,"%",sep = "")), vjust=-0.3, size = 2.5) +
-                        labs(title = "Frecuencia de ITEMS", x = "", y = "") +
-                        theme(axis.title.y = element_text(size = 10))
-                
-                ##Gráfica de ticket
-                ## Aquí debería de iniciar con un table(input$ticket)
-                
-                freq <- data.frame(table(data$ticket)) 
-                freq <- freq[order(freq$Freq, decreasing = T),]
-                freq <- data.frame(table(freq$Freq))
-                freq <- freq[order(freq$Freq, decreasing = T),]
-                if(nrow(freq)>10){
-                        freq <- freq[1:10,]
-                }
-                names(freq) <- c("size","count")
-                total <- sum(freq$count)
-                rela <- c(rel = round(freq$count/total,4))
-                
-                ticket <- ggplot(freq, aes(x= reorder(size, -count), y= count))+
-                        geom_text(aes(label=paste(rela*100,"%",sep = "")), vjust = -0.3, size = 2.5) +
-                        geom_bar(fill="#FE6B6D", stat="identity")+
-                        labs(title = "Frecuencia tamaños de tickets") +
-                        theme(axis.text.x = element_blank(), axis.text.y = element_blank(), axis.title.y = element_text(size = 10))
-                
-                ggarrange(trans, ticket , ncol = 2, nrow = 1, align = "v", widths = c(2,1))
-                
-                })
         
-    tr <- reactive({
-        
-        data <- file_basket()
+        data <- file_t()
         names(data) <- c("ticket","items")
         
-        data <- data[complete.cases(data),]
+        freq <- data.frame(table(data$items)) 
+        freq <- freq[order(freq$Freq, decreasing = T),]
+        total <- sum(freq$Freq)
+        freq <- freq[1:10,]
+        names(freq) <- c("items","count")
+        relativo <- c(rel = round(freq$count/total,4))
+        
+        g <- ggplot(freq, aes(x= reorder(items, -count), y = count))
+        
+        trans <- g + geom_bar(fill="#F5CFDC", stat="identity")+
+            geom_text(aes(label=paste(relativo*100,"%",sep = "")), vjust=-0.3, size = 2.5) +
+            labs(title = "Frecuencia de ITEMS", x = "", y = "") +
+            theme(axis.title.y = element_text(size = 10))
+        
+        ##Gráfica de ticket
+        ## Aquí debería de iniciar con un table(input$ticket)
+        
+        freq <- data.frame(table(data$ticket)) 
+        freq <- freq[order(freq$Freq, decreasing = T),]
+        freq <- data.frame(table(freq$Freq))
+        freq <- freq[order(freq$Freq, decreasing = T),]
+        if(nrow(freq)>10){
+            freq <- freq[1:10,]
+        }
+        names(freq) <- c("size","count")
+        total <- sum(freq$count)
+        rela <- c(rel = round(freq$count/total,4))
+        
+        ticket <- ggplot(freq, aes(x= reorder(size, -count), y= count))+
+            geom_text(aes(label=paste(rela*100,"%",sep = "")), vjust = -0.3, size = 2.5) +
+            geom_bar(fill="#FE6B6D", stat="identity")+
+            labs(title = "Frecuencia tamaños de tickets", x = "") +
+            theme(axis.text.x = element_blank(), axis.text.y = element_blank(), axis.title.y = element_text(size = 10))
+        
+        ggarrange(trans, ticket , ncol = 2, nrow = 1, align = "v", widths = c(2,1))
+        
+    })
+    
+    tr <- reactive({
+        
+        data <- file_t()
+        names(data) <- c("ticket","items")
+        
         data$ticket <- as.character(data$ticket)
         data$items <- as.character(data$items)
         
@@ -190,42 +180,45 @@ server <- function(input, output) {
                              function(df1)paste(df1$items, collapse = ","))
         
         write.table(x = transaction,
-                    file = tmp_cu <- file(),
+                    file = tmp <- file(),
                     row.names = FALSE,
                     quote = FALSE)
         
-        read.transactions(file = tmp_cu,
+        read.transactions(file = tmp,
                           format = "basket",
                           sep = ",", 
                           rm.duplicates=TRUE)
         
     })
     
-    output$grafo <- visNetwork::renderVisNetwork({
-        
-        tr <- tr()
-        
+    
+    
+    
+    
+    rls <- reactive({
         support <- 4/dim(tr)[1]
         
-        rules <- apriori(data = tr,
-                         parameter = list(supp=0.0001, conf=input$conf, minlen = 3),
+        rules <- apriori(data = tr(),
+                         parameter = list(supp=0.0001, conf=.02, minlen = 3),
                          control = list(verbose = FALSE))
         
-        rules <- rules[is.maximal(rules)]
-        
-        top.count <- sort(rules, by="count", decreasing=T)
-        
-        plot(top.count, method="graph",engine = "htmlwidget")
+        sort(rules, by="count", decreasing=T)
         
     })
     
-    output$rules <- renderDataTable({
+    
+    output$grafo <- visNetwork::renderVisNetwork({plot(rls(), method="graph",engine = "htmlwidget")})
+    
+    
+    
+    
+    output$rules <- DT::renderDataTable({
         
         tr <- tr()
         
         support <- 4/dim(tr)[1]
         rules <- apriori(data = tr, 
-                         parameter = list(supp=support, conf=input$conf, maxlen = 2),
+                         parameter = list(supp=support, conf=.02, maxlen = 2),
                          control = list(verbose = FALSE))
         
         top.count <- sort(rules, by="count", decreasing=T)
@@ -250,7 +243,6 @@ server <- function(input, output) {
         
     })
 }
-                   
+
 # Run the application 
 shinyApp(ui = ui, server = server)
-
