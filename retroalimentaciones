@@ -1,0 +1,18 @@
+Modificaciones
+
+1. Modularizar los scripts.
+2. Quitar la visualización de "Tabla cargada", y solo dejar la de "seleccionados".
+3. Agregar por pestañas los pasos a seguir. ej: Paso 1: Carga tu tabla de datos; Paso 2: Selecciona las columnas de importancia; Paso 3: Visualiza los resultados del analisis; Paso 4: Revisa tu resumen condensado.
+
+
+1. botón de Run.
+2. Manejar las tablas.
+3. Resumenes.
+4. Saber cual es el tiempo considerado.
+5. Información contextual por fichas.
+
+
+
+
+
+
