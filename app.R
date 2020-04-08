@@ -12,6 +12,7 @@ library(plyr)
 library(DT)
 library(tidyverse)
 library(readxl)
+library(plotly)
 
 options(shiny.maxRequestSize=30*1024^2)
 # Define UI for application that draws a histogram
@@ -43,13 +44,23 @@ ui <- fluidPage(
 
                 tabPanel(
                     title = "Análisis de ventas",
+                    fluidRow(
+                        column(width = 6,
+                               h4("Número de transacciones"),
+                               textOutput("transacciones"),
+                               ),
+                        column(width = 6,
+                               h4("Número de items"),
+                               textOutput("items")
+                               )
+                    ),
+                    br(),
                     h3("Items más vendidos"),
                     br(),
-                    plotOutput("freq_item", width = "100%"),
-                    br(),
+                    plotlyOutput("freq_item", width = "100%"),
                     br(),
                     h3("Tickets de compra"),
-                    plotOutput(outputId = "freq_ticket", width = "100%")
+                    plotlyOutput(outputId = "freq_ticket", width = "100%")
                 ),
                 
                 tabPanel(
@@ -60,14 +71,14 @@ ui <- fluidPage(
                     br(),
                     h3("Comunidades de ITEMS"),
                     br(),
-                    visNetwork::visNetworkOutput("grafo")
+                    visNetwork::visNetworkOutput("grafo", width = "100%", height = 700)
                 ),
                 
                 tabPanel(
                     title = "Itemsets",
                     h3("Itemsets más frecuentes"),
                     br(),
-                    plotOutput(outputId = "top10graf"),
+                    plotlyOutput(outputId = "top10graf", height = 700),
                     br(),
                     DT::dataTableOutput(outputId = "top10")
                 ),
@@ -153,7 +164,7 @@ server <- function(input, output) {
         data
     })
     
-    output$freq_item <- renderPlot({
+    output$freq_item <- renderPlotly({
         data <- file_t()
         names(data) <- c("ticket","items")
         
@@ -162,18 +173,20 @@ server <- function(input, output) {
         total <- sum(freq$Freq)
         freq <- freq[1:10,]
         names(freq) <- c("items","count")
-        relativo <- c(rel = round(freq$count/total,4)) 
+        freq$items <- as.character(freq$items)
+        relativo <- c(rel = round(freq$count/total,4))
+        relativo <- paste(round(100*relativo,2), "%", sep="")
+        freq <- data.frame(freq,relativo)
         
-        g <- ggplot(freq, aes(x= reorder(items, -count), y = count))
-        
-        g + geom_bar(fill="#F5CFDC", stat="identity")+
-            geom_text(aes(label=paste(relativo*100,"%",sep = "")), vjust=-0.3, size = 2.5) +
-            labs(x = "", y = "") +
-            theme(axis.title.y = element_text(size = 10))
-        
+        plot_ly(freq, x = reorder(freq$items, -freq$count), y = freq$count, type = "bar",
+                text = relativo, textposition = "outside",
+                marker = list(color = "#F5CFDC")) %>%
+            layout(title = "",
+                   xaxis = list(title = "", tickangle = -45),
+                   yaxis = list(title = ""))
     })
     
-    output$freq_ticket <- renderPlot({
+    output$freq_ticket <- renderPlotly({
         
         data <- file_t()
         names(data) <- c("ticket","items")
@@ -188,12 +201,14 @@ server <- function(input, output) {
         names(freq) <- c("size","count")
         total <- sum(freq$count)
         rela <- c(rel = round(freq$count/total,4))
+        rela<- paste(round(100*rela,2), "%", sep="")
         
-        ggplot(freq, aes(x= reorder(size, -count), y= count))+
-            geom_text(aes(label=paste(rela*100,"%",sep = "")), vjust = -0.3, size = 2.5) +
-            geom_bar(fill="#FE6B6D", stat="identity")+
-            labs(x = "", y = "") +
-            theme(axis.title.y = element_text(size = 10))
+        plot_ly(freq, x = reorder(freq$size, -freq$count), y = freq$count, type = "bar",
+                text = rela, textposition = "outside",
+                marker = list(color = "#FE6B6D")) %>%
+            layout(title = "",
+                   xaxis = list(title = "", tickangle = -45),
+                   yaxis = list(title = ""))
         
     })
     
@@ -223,6 +238,17 @@ server <- function(input, output) {
         
     })
     
+    output$transacciones <- renderText({
+        tr <- tr()
+        a <- summary(tr)
+        a@Dim[1]
+    })
+    
+    output$items <- renderText({
+        tr <- tr()
+        a <- summary(tr)
+        a@Dim[2]
+    })
    
     
     output$grafo <- visNetwork::renderVisNetwork({
@@ -361,15 +387,20 @@ server <- function(input, output) {
     })
     
     
-    output$top10graf <- renderPlot({
+    output$top10graf <- renderPlotly({
         top_10 <- top()
-        as(top_10, Class = "data.frame") %>%
-            ggplot(aes(x = reorder(items, count), y= count)) +
-            geom_col(fill="#F5CFDC") +
-            coord_flip() +
-            labs(x = "", y = "") +
-            theme_bw()
-        })
+        
+        top_10 <- as(top_10, Class = "data.frame")
+        top_10$items <- as.character(top_10$items)
+        
+        plot_ly(data = top_10, x = top_10$count, y = reorder(top_10$items,top_10$count), type = "bar", 
+                orientation = "h",
+                marker = list(color = "#F5CFDC")) %>%
+            layout(title = "",
+                   xaxis = list(title = "", tickangle = -45),
+                   yaxis = list(title = ""))
+    })
+
 
 }
 
