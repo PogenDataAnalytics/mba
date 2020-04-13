@@ -22,24 +22,19 @@ ui <- fluidPage(
     # Application title
     titlePanel("Aplicación Basket"),
     
-    sidebarLayout(
-        
-        sidebarPanel(
-            radioButtons(inputId = "file_type", label = "Selecciona el tipo de archivo a cargar",
-                                  choices = c(Excel = "xls",
-                                              csv.file = "csv"),
-                                  selected = "csv"),
-            uiOutput(outputId = "read_file"),
-            uiOutput(outputId = "tickets_col"),
-            uiOutput(outputId = "art_col"), 
-            width = 3
-        ),
-    
         mainPanel(
             tabsetPanel(
                 type = "tabs",
                 tabPanel(
                         title = "Carga de archivos", 
+                        radioButtons(inputId = "file_type", label = "Selecciona el tipo de archivo a cargar",
+                                     choices = c(Excel = "xls",
+                                                 csv.file = "csv",
+                                                 Demo = "demo"),
+                                     selected = "csv"),
+                        uiOutput(outputId = "read_file"),
+                        uiOutput(outputId = "tickets_col"),
+                        uiOutput(outputId = "art_col"), 
                         DT::dataTableOutput(outputId = "basket_file")),
 
                 tabPanel(
@@ -78,7 +73,7 @@ ui <- fluidPage(
                     title = "Itemsets",
                     h3("Itemsets más frecuentes"),
                     br(),
-                    plotlyOutput(outputId = "top10graf", height = 700),
+                    plotlyOutput(outputId = "top10graf"),
                     br(),
                     DT::dataTableOutput(outputId = "top10")
                 ),
@@ -94,30 +89,29 @@ ui <- fluidPage(
                 )
             )
         )
-    )
 )
 
 # Define server logic required to draw a histogram
-server <- function(input, output) {
-    
+server <- function(input, output, session) {
+
     output$read_file <- renderUI({
         if (input$file_type == "csv") {
             fileInput(inputId = "basket",
-                      label = "Selecciona el archivo .csv basket",
-                      accept = c(
-                          'text/csv',
-                          'text/comma-separated-values',
-                          '.csv')
-                      )
-        }else{
-            fileInput(inputId = 'basket', 
-                      label = 'Selecciona el archivo .xls basket',
-                      accept = c(".xlsx",
-                                 ".xls")
-                      )
-        }
-    })
-    
+                         label = "Selecciona el archivo .csv basket",
+                         accept = c(
+                              'text/csv',
+                              'text/comma-separated-values',
+                              '.csv')
+                )
+        }else if(input$file_type == "basket"){
+                fileInput(inputId = 'basket', 
+                         label = 'Selecciona el archivo .xls basket',
+                         accept = c(".xlsx",
+                                     ".xls")
+                )
+            }
+        })
+
     
     df_upload <- reactive({
         inFile <- input$basket
@@ -126,10 +120,19 @@ server <- function(input, output) {
                 return(NULL)
             df <- read.csv(inFile$datapath,header = TRUE,sep = ",")
             
-        }else{
+        }else if(input$file_type == "basket"){
             if(is.null(inFile))
                 return(NULL)
             df <- read_excel(path = inFile$datapath)
+        }else if(input$file_type == "Demo"){
+            filepath <- "tabla.csv"
+            
+            df <- reactiveFileReader(
+                intervalMillis = 1000,
+                session = session,
+                filePath = filepath,
+                readFunc = read.csv,
+            )
         }
     return(df)
     })
