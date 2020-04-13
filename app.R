@@ -91,7 +91,6 @@ ui <- fluidPage(
         )
 )
 
-
 # Define server logic required to draw a histogram
 server <- function(input, output, session) {
 
@@ -397,12 +396,14 @@ server <- function(input, output, session) {
         top_10 <- as(top_10, Class = "data.frame")
         top_10$items <- as.character(top_10$items)
         
-        plot_ly(data = top_10, x = top_10$count, y = reorder(top_10$items,top_10$count), type = "bar", orientation = "h",
+        plot_ly(data = top_10, x = top_10$count, y = reorder(top_10$items,top_10$count), type = "bar", 
+                orientation = "h",
                 marker = list(color = "#F5CFDC")) %>%
             layout(title = "",
                    xaxis = list(title = "", tickangle = -45),
                    yaxis = list(title = ""))
     })
+
 
 }
 
