@@ -16,27 +16,30 @@ library(plotly)
 
 options(shiny.maxRequestSize=30*1024^2)
 # Define UI for application that draws a histogram
-ui <- fluidPage(
-
-
-    # Application title
-    titlePanel("Aplicación Basket"),
+ui <- navbarPage(
     
+    title = "Plataforma Pogen",
+    id = "inTabset",
+    tabPanel(
+        title = "Carga de archivos", 
+        radioButtons(inputId = "file_type", label = "Selecciona el tipo de archivo a cargar",
+                     choices = c(Excel = "xls",
+                                 csv.file = "csv",
+                                 Demo = "demo"),
+                     selected = "csv"),
+        uiOutput(outputId = "read_file"),
+        uiOutput(outputId = "tickets_col"),
+        uiOutput(outputId = "art_col"), 
+        DT::dataTableOutput(outputId = "basket_file"),
+        actionButton("jump2", "Continuar")
+    ),
+
+    tabPanel(
+        title = "",
+        value = "analisis",
         mainPanel(
             tabsetPanel(
                 type = "tabs",
-                tabPanel(
-                        title = "Carga de archivos", 
-                        radioButtons(inputId = "file_type", label = "Selecciona el tipo de archivo a cargar",
-                                     choices = c(Excel = "xls",
-                                                 csv.file = "csv",
-                                                 Demo = "demo"),
-                                     selected = "csv"),
-                        uiOutput(outputId = "read_file"),
-                        uiOutput(outputId = "tickets_col"),
-                        uiOutput(outputId = "art_col"), 
-                        DT::dataTableOutput(outputId = "basket_file")),
-
                 tabPanel(
                     title = "Análisis de ventas",
                     fluidRow(
@@ -87,8 +90,11 @@ ui <- fluidPage(
                     h3("Reglas de items más frecuentes"),
                     DT::dataTableOutput(outputId = "reglas_freq")
                 )
-            )
+            ),
+                
+                actionButton("jump1", "Retroceder"),
         )
+    )
 )
 
 # Define server logic required to draw a histogram
@@ -125,7 +131,6 @@ server <- function(input, output, session) {
                 return(NULL)
             df <- read_excel(path = inFile$datapath)
         }else{
-
             df <- read.csv(file = "tabla.csv")
         }
     return(df)
@@ -397,7 +402,16 @@ server <- function(input, output, session) {
                    xaxis = list(title = "", tickangle = -45),
                    yaxis = list(title = ""))
     })
-
+    
+    observeEvent(input$jump2, {
+        updateTabsetPanel(session, "inTabset",
+                          selected = "analisis")
+    })
+    
+    observeEvent(input$jump1, {
+        updateTabsetPanel(session, "inTabset",
+                          selected = "carga")
+    })
 
 }
 
