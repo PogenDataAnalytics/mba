@@ -30,13 +30,37 @@ ui <- navbarPage(
         uiOutput(outputId = "read_file"),
         uiOutput(outputId = "tickets_col"),
         uiOutput(outputId = "art_col"), 
+        actionButton("jump2", "Continuar",
+                     style="color: #fff; background-color: #1979a9"),
+        br(),
+        br(),
         DT::dataTableOutput(outputId = "basket_file"),
-        actionButton("jump2", "Continuar")
+        
     ),
 
     tabPanel(
         title = "",
         value = "analisis",
+        tags$head(
+            tags$style(HTML("hr {border-top: 1px solid #000000;}"))
+        ),
+        sidebarPanel(
+          h4("Análisis de ventas"),
+          hr(),
+          p("Visualiza la información general de tus ventas. Conoce tus items que más compran tus clientes y el tamaño de sus transacciones"),
+          br(),
+          h4("Market Basket"),
+          hr(),
+          p("Conoce las colecciones de productos que tus clientes compran en una misma transacción"),
+          br(),
+          h4("Itemsets"),
+          hr(),
+          p("Visualiza los 10 de conjuntos de items que tus clientes compran más en una misma transacción"),
+          br(),
+          h4("Top Reglas"),
+          hr(),
+          p("Conoce las reglas de asociación con mayor probabilidad de suceder. Además, conoce las reglas  de tus productos más vendidos.")
+        ),
         mainPanel(
             tabsetPanel(
                 type = "tabs",
@@ -82,7 +106,7 @@ ui <- navbarPage(
                 ),
                 
                 tabPanel(
-                    title = "Top 10 Reglas",
+                    title = "Top Reglas",
                     h3("Reglas con mayor probabilidad"),
                     br(),
                     DT::dataTableOutput(outputId = "reglas_prob"),
