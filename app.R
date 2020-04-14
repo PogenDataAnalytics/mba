@@ -109,8 +109,8 @@ server <- function(input, output, session) {
                          accept = c(".xlsx",
                                      ".xls")
                 )
-            }
-        })
+        }
+    })
 
     
     df_upload <- reactive({
@@ -124,15 +124,9 @@ server <- function(input, output, session) {
             if(is.null(inFile))
                 return(NULL)
             df <- read_excel(path = inFile$datapath)
-        }else if(input$file_type == "Demo"){
-            filepath <- "tabla.csv"
-            
-            df <- reactiveFileReader(
-                intervalMillis = 1000,
-                session = session,
-                filePath = filepath,
-                readFunc = read.csv,
-            )
+        }else{
+
+            df <- read.csv(file = "tabla.csv")
         }
     return(df)
     })
