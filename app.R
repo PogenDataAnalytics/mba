@@ -21,7 +21,8 @@ ui <- navbarPage(
     title = "Plataforma Pogen",
     id = "inTabset",
     tabPanel(
-        title = "Carga de archivos", 
+        title = "Carga de archivos",
+        value = "carga",
         radioButtons(inputId = "file_type", 
                      label = "Selecciona el tipo de archivo a cargar",
                      choices = c(Excel = "xls",
@@ -60,7 +61,11 @@ ui <- navbarPage(
           br(),
           h4("Top Reglas"),
           hr(),
-          p("Conoce las reglas de asociación con mayor probabilidad de suceder. Además, conoce las reglas  de tus productos más vendidos.")
+          p("Conoce las reglas de asociación con mayor probabilidad de suceder. Además, conoce las reglas  de tus productos más vendidos."),
+          br(),
+          br(),
+          actionButton("jump1", "Retroceder",
+                       style="color: #fff; background-color: #1979a9"),
         ),
         mainPanel(
             tabsetPanel(
@@ -130,10 +135,7 @@ ui <- navbarPage(
                     DT::dataTableOutput(outputId = "item5"),
                 )
             ),
-                br(),
-                br(),
-                actionButton("jump1", "Retroceder",
-                             style="color: #fff; background-color: #1979a9"),
+                
         )
     )
 )
@@ -303,10 +305,14 @@ server <- function(input, output, session) {
         support <- 4/dim(tr)[1]
         
         rules <- apriori(data = tr,
-                         parameter = list(supp=support, conf=0.0001, minlen = 3),
+                         parameter = list(supp=support, conf=0.0001, minlen =2, maxlen = 4),
                          control = list(verbose = FALSE))
         
         rules <- rules[is.maximal(rules)]
+        
+        rules <- sort(rules, by = "count", decreasing = T)
+        
+        rules <- rules[1:100]
         
         plot(rules, method="graph",engine = "htmlwidget")
 
