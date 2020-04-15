@@ -113,11 +113,27 @@ ui <- navbarPage(
                     DT::dataTableOutput(outputId = "reglas_prob"),
                     br(),
                     h3("Reglas de items más frecuentes"),
-                    DT::dataTableOutput(outputId = "reglas_freq")
+                    br(),
+                    h4(textOutput(outputId = "item1_name")),
+                    DT::dataTableOutput(outputId = "item1"),
+                    br(),
+                    h4(textOutput(outputId = "item2_name")),
+                    DT::dataTableOutput(outputId = "item2"),
+                    br(),
+                    h4(textOutput(outputId = "item3_name")),
+                    DT::dataTableOutput(outputId = "item3"),
+                    br(),
+                    h4(textOutput(outputId = "item4_name")),
+                    DT::dataTableOutput(outputId = "item4"),
+                    br(),
+                    h4(textOutput(outputId = "item5_name")),
+                    DT::dataTableOutput(outputId = "item5"),
                 )
             ),
-                
-                actionButton("jump1", "Retroceder"),
+                br(),
+                br(),
+                actionButton("jump1", "Retroceder",
+                             style="color: #fff; background-color: #1979a9"),
         )
     )
 )
@@ -303,7 +319,7 @@ server <- function(input, output, session) {
                           parameter = list(support = soporte,
                                            confidence = 0.01,
                                            minlen = 2,
-                                           maxlen = 2,
+                                           maxlen = 4,
                                            target = "rules"))
         reglas <- reglas[is.maximal(reglas)]
         sort(reglas, by = "count", decreasing = T)
@@ -348,29 +364,39 @@ server <- function(input, output, session) {
         
         df_fishers <- select(.data = df_reglas, rules, confidence, count, fishersExactTest)
         df_fishers <- df_fishers[order(df_fishers$fishersExactTest, decreasing = F),]
-        top_10 <- df_fishers[1:10,]
-        sec <- seq(1,10,2)
+        
+        if(nrow(df_fishers)<10){
+            top_10 <- df_fishers
+            sec <- seq(1,nrow(df_fishers),2)
+        } else {
+            top_10 <- df_fishers[1:10,]
+            sec <- seq(1,10,2)
+        }
+        
+        sort_rows <- top_10[order(as.numeric(row.names(top_10))),]
+       
         top_5 <- as.data.frame(matrix(nrow = 0, ncol = 3))
         names(top_5) <- c("rules","confidence","count")
         for(i in sec){
-            if(top_10[i,2]>top_10[i+1,2]){
-                top_5 <- rbind(top_5, top_10[i,1:3])
+            if(sort_rows[i,2]>sort_rows[i+1,2]){
+                top_5 <- rbind(top_5, sort_rows[i,])
             } else {
-                top_5 <- rbind(top_5, top_10[i+1,1:3])
+                top_5 <- rbind(top_5, sort_rows[i+1,])
             }
         }
         
-        rownames(top_5) <- c()
+        top_5$confidence <- round(top_5$confidence,3)
         
-        top_5$confidence <- round(top_5$confidence,4)
+        top_5 <- top_5[order(top_5$fishersExactTest),]
+        top_5$fishersExactTest <- signif(top_5$fishersExactTest, digits = 3)
+        names(top_5) <- c("Reglas", "% Conf", "Count", "P-Fisher")
         
-        top_5 <- top_5[order(top_5$count, decreasing = T),]
-        
-        return(top_5)
+        datatable(data = top_5, rownames = F) %>%
+            formatPercentage(columns = "% Conf", digits = 1)
         
     })
     
-    output$reglas_freq <- DT::renderDataTable({
+    tabla_freq <- reactive({
         
         reglas <- reglas()
         trans <- tr()
@@ -378,19 +404,131 @@ server <- function(input, output, session) {
         metricas <- interestMeasure(x = reglas, measure = c("coverage", "fishersExactTest"),
                                     transactions = trans)
         quality(reglas) <- cbind(quality(reglas), metricas)
-        df_reglas <- as(reglas, Class = "data.frame")
         
-        df_cov <- select(.data = df_reglas, rules, coverage, count, fishersExactTest)
-        df_cov <- df_cov[order(-df_cov$coverage, df_cov$fishersExactTest),]
-        df_cov <- df_cov[1:5,] 
-        df_cov <- select(.data = df_cov, rules, coverage, count)
-        df_cov$coverage <- round(df_cov$coverage,4)
+        cut <- unlist(strsplit(labels(reglas),"=>"))
         
-        rownames(df_cov) <- c()
+        lhs <- data.frame(lhs = cut[seq(1,length(cut),2)])
+        rhs <- data.frame(rhs = cut[seq(2,length(cut),2)])
+        igual <- igual <- as.data.frame(matrix(nrow=(length(cut)/2), ncol = 1))
+        igual[,1] <- "=>"
+        names(igual) <- "=>"
+        quality <- data.frame(reglas@quality)
+        conf <- data.frame(quality$confidence)
+        count <- data.frame(quality$count)
+        fisher <- data.frame(quality$fishersExactTest)
+        fisher <- signif(fisher, digits = 3)
+
+        tabla <- data.frame(lhs, igual, rhs, conf, count, fisher)
+        names(tabla) <- c("Lhs", "=>", "Rhs", "% Conf", "Count", "P-Fisher")
         
-        df_cov <- df_cov[order(df_cov$count, decreasing = T),]
-        
+        df_cov <- tabla[order(tabla$`P-Fisher`),]
+
         return(df_cov)
+        
+    })
+    
+    items_freq <- reactive({
+        
+        data <- file_t()
+        names(data) <- c("ticket","items")
+        
+        freq <- data.frame(table(data$items)) 
+        freq <- freq[order(freq$Freq, decreasing = T),]
+        
+        items <- freq$Var1
+        
+        return(items)
+    
+    })
+    
+    output$item1_name <- renderText({
+        df_cov <- tabla_freq()
+        items <- items_freq()
+        item <- as.character(items[1])
+    })
+    
+    output$item1 <- DT::renderDataTable({
+        df_cov <- tabla_freq()
+        items <- items_freq()
+        
+        item <- as.character(items[1])
+        item <- paste("{",item,"} ", sep = "")
+        item1 <- filter(.data = df_cov, Lhs == item)
+        
+        datatable(data = item1, rownames = F) %>%
+            formatPercentage(columns = "% Conf", digits = 1)
+    })
+    
+    output$item2_name <- renderText({
+        df_cov <- tabla_freq()
+        items <- items_freq()
+        item <- as.character(items[2])
+    })
+    
+    output$item2 <- DT::renderDataTable({
+        df_cov <- tabla_freq()
+        items <- items_freq()
+        
+        item <- as.character(items[2])
+        item <- paste("{",item,"} ", sep = "")
+        item1 <- filter(.data = df_cov, Lhs == item)
+        
+        datatable(data = item1, rownames = F) %>%
+            formatPercentage(columns = "% Conf", digits = 1)
+    })
+    
+    output$item3_name <- renderText({
+        df_cov <- tabla_freq()
+        items <- items_freq()
+        item <- as.character(items[3])
+    })
+    
+    output$item3 <- DT::renderDataTable({
+        df_cov <- tabla_freq()
+        items <- items_freq()
+        
+        item <- as.character(items[3])
+        item <- paste("{",item,"} ", sep = "")
+        item1 <- filter(.data = df_cov, Lhs == item)
+        
+        datatable(data = item1, rownames = F) %>%
+            formatPercentage(columns = "% Conf", digits = 1)
+    })
+    
+    output$item4_name <- renderText({
+        df_cov <- tabla_freq()
+        items <- items_freq()
+        item <- as.character(items[4])
+    })
+    
+    output$item4 <- DT::renderDataTable({
+        df_cov <- tabla_freq()
+        items <- items_freq()
+        
+        item <- as.character(items[4])
+        item <- paste("{",item,"} ", sep = "")
+        item1 <- filter(.data = df_cov, Lhs == item)
+        
+        datatable(data = item1, rownames = F) %>%
+            formatPercentage(columns = "% Conf", digits = 1)
+    })
+    
+    output$item5_name <- renderText({
+        df_cov <- tabla_freq()
+        items <- items_freq()
+        item <- as.character(items[5])
+    })
+    
+    output$item5 <- DT::renderDataTable({
+        df_cov <- tabla_freq()
+        items <- items_freq()
+        
+        item <- as.character(items[5])
+        item <- paste("{",item,"} ", sep = "")
+        item1 <- filter(.data = df_cov, Lhs == item)
+        
+        datatable(data = item1, rownames = F) %>%
+            formatPercentage(columns = "% Conf", digits = 1)
     })
     
     top <- reactive({
@@ -399,11 +537,17 @@ server <- function(input, output, session) {
         itemsets <- apriori(data = trans,
                             parameter = list(support = soporte,
                                              minlen = 2,
-                                             maxlen = 5,
+                                             maxlen = 4,
                                              target = "frequent itemset"))
         
         itemsets <- itemsets[is.maximal(itemsets)]
-        sort(itemsets, decreasing = T)[1:10]
+        
+        if(dim(itemsets@quality)[1]<10){
+            sort(itemsets, decreasing = T)
+        } else {
+            sort(itemsets, decreasing = T)[1:10]
+        }
+        
     })
     
     
