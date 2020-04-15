@@ -389,10 +389,10 @@ server <- function(input, output, session) {
         
         top_5 <- top_5[order(top_5$fishersExactTest),]
         top_5$fishersExactTest <- signif(top_5$fishersExactTest, digits = 3)
+        names(top_5) <- c("Reglas", "% Conf", "Count", "P-Fisher")
         
-        rownames(top_5) <- c()
-        
-        return(top_5)
+        datatable(data = top_5, rownames = F) %>%
+            formatPercentage(columns = "% Conf", digits = 1)
         
     })
     
@@ -416,12 +416,13 @@ server <- function(input, output, session) {
         conf <- data.frame(quality$confidence)
         count <- data.frame(quality$count)
         fisher <- data.frame(quality$fishersExactTest)
+        fisher <- signif(fisher, digits = 3)
 
         tabla <- data.frame(lhs, igual, rhs, conf, count, fisher)
         names(tabla) <- c("Lhs", "=>", "Rhs", "% Conf", "Count", "P-Fisher")
         
         df_cov <- tabla[order(tabla$`P-Fisher`),]
-        
+
         return(df_cov)
         
     })
@@ -454,7 +455,8 @@ server <- function(input, output, session) {
         item <- paste("{",item,"} ", sep = "")
         item1 <- filter(.data = df_cov, Lhs == item)
         
-        return(item1)
+        datatable(data = item1, rownames = F) %>%
+            formatPercentage(columns = "% Conf", digits = 1)
     })
     
     output$item2_name <- renderText({
@@ -471,7 +473,8 @@ server <- function(input, output, session) {
         item <- paste("{",item,"} ", sep = "")
         item1 <- filter(.data = df_cov, Lhs == item)
         
-        return(item1)
+        datatable(data = item1, rownames = F) %>%
+            formatPercentage(columns = "% Conf", digits = 1)
     })
     
     output$item3_name <- renderText({
@@ -488,7 +491,8 @@ server <- function(input, output, session) {
         item <- paste("{",item,"} ", sep = "")
         item1 <- filter(.data = df_cov, Lhs == item)
         
-        return(item1)
+        datatable(data = item1, rownames = F) %>%
+            formatPercentage(columns = "% Conf", digits = 1)
     })
     
     output$item4_name <- renderText({
@@ -505,7 +509,8 @@ server <- function(input, output, session) {
         item <- paste("{",item,"} ", sep = "")
         item1 <- filter(.data = df_cov, Lhs == item)
         
-        return(item1)
+        datatable(data = item1, rownames = F) %>%
+            formatPercentage(columns = "% Conf", digits = 1)
     })
     
     output$item5_name <- renderText({
@@ -522,7 +527,8 @@ server <- function(input, output, session) {
         item <- paste("{",item,"} ", sep = "")
         item1 <- filter(.data = df_cov, Lhs == item)
         
-        return(item1)
+        datatable(data = item1, rownames = F) %>%
+            formatPercentage(columns = "% Conf", digits = 1)
     })
     
     top <- reactive({
