@@ -22,11 +22,12 @@ ui <- navbarPage(
     id = "inTabset",
     tabPanel(
         title = "Carga de archivos", 
-        radioButtons(inputId = "file_type", label = "Selecciona el tipo de archivo a cargar",
+        radioButtons(inputId = "file_type", 
+                     label = "Selecciona el tipo de archivo a cargar",
                      choices = c(Excel = "xls",
                                  csv.file = "csv",
                                  Demo = "demo"),
-                     selected = "csv"),
+                     selected = "demo"),
         uiOutput(outputId = "read_file"),
         uiOutput(outputId = "tickets_col"),
         uiOutput(outputId = "art_col"), 
@@ -164,13 +165,15 @@ server <- function(input, output, session) {
     output$tickets_col <- renderUI({
         selectInput(inputId = "select_ticket_col",
                     label = "Selecciona la columna que contiene los tickets",
-                    choices = names(df_upload()))
+                    choices = names(df_upload()), 
+                    selected = names(df_upload()[1]))
     })
     
     output$art_col <- renderUI({
         selectInput(inputId = "select_art_col",
                     label = "Selecciona la columna que contiene los artículos",
-                    choices = names(df_upload()))
+                    choices = names(df_upload()), 
+                    selected = names(df_upload()[2]))
     })
     
     output$basket_file <- DT::renderDataTable({
