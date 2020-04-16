@@ -152,7 +152,7 @@ server <- function(input, output, session) {
                               'text/comma-separated-values',
                               '.csv')
                 )
-        }else if(input$file_type == "basket"){
+        }else if(input$file_type == "xls"){
                 fileInput(inputId = 'basket', 
                          label = 'Selecciona el archivo .xls basket',
                          accept = c(".xlsx",
@@ -169,7 +169,7 @@ server <- function(input, output, session) {
                 return(NULL)
             df <- read.csv(inFile$datapath,header = TRUE,sep = ",")
             
-        }else if(input$file_type == "basket"){
+        }else if(input$file_type == "xls"){
             if(is.null(inFile))
                 return(NULL)
             df <- read_excel(path = inFile$datapath)
