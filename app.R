@@ -39,6 +39,23 @@ ui <- navbarPage(
         DT::dataTableOutput(outputId = "basket_file"),
         
     ),
+    
+    tabPanel(
+        title = "",
+        value = "recomendaciones",
+        h2("Recomendaciones para tu empresa", align = "center"),
+        br(),
+        p("El Market Basket Analysis, es utilizado en la industria del 
+          retail e e-commerce para entender el comportamiento de compra 
+          de los clientes. Las recomendaciones te presentaremos a continuación 
+          tienen el propósito de incentivar e incrementar en tus clientes las 
+          compras mayores a dos productos por transacción."),
+        actionButton("jump3", "Continuar",
+                     style="color: #fff; background-color: #1979a9",
+                     align = "center"),
+        br(),
+        br()
+    ),
 
     tabPanel(
         title = "",
@@ -314,8 +331,9 @@ server <- function(input, output, session) {
         
         rules <- rules[1:100]
         
+        
         plot(rules, method="graph",engine = "htmlwidget")
-
+        
         })
     
     reglas <- reactive({
@@ -582,12 +600,17 @@ server <- function(input, output, session) {
     
     observeEvent(input$jump2, {
         updateTabsetPanel(session, "inTabset",
+                          selected = "recomendaciones")
+    })
+    
+    observeEvent(input$jump3, {
+        updateTabsetPanel(session, "inTabset",
                           selected = "analisis")
     })
     
     observeEvent(input$jump1, {
         updateTabsetPanel(session, "inTabset",
-                          selected = "carga")
+                          selected = "recomendaciones")
     })
 
 }
