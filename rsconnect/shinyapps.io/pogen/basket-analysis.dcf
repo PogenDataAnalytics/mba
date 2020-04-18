@@ -1,0 +1,13 @@
+name: basket-analysis
+title: basket-analysis
+username:
+account: pogen
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 2115828
+bundleId: 3027807
+url: https://pogen.shinyapps.io/basket-analysis/
+when: 1587142052.78164
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: README.md|retroalimentaciones
