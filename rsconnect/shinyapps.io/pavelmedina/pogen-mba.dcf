@@ -1,0 +1,13 @@
+name: pogen-mba
+title: pogen-mba
+username:
+account: pavelmedina
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 2115737
+bundleId: 3012367
+url: https://pavelmedina.shinyapps.io/pogen-mba/
+when: 1586880345.65342
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: README.md|retroalimentaciones
