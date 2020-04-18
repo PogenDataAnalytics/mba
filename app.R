@@ -47,9 +47,7 @@ ui <- navbarPage(
         br(),
         p("El Market Basket Analysis, es utilizado en la industria del 
           retail e e-commerce para entender el comportamiento de compra 
-          de los clientes. Las recomendaciones te presentaremos a continuación 
-          tienen el propósito de incentivar e incrementar en tus clientes las 
-          compras mayores a dos productos por transacción."),
+          de los clientes."),
         actionButton("jump3", "Continuar",
                      style="color: #fff; background-color: #1979a9",
                      align = "center"),
@@ -243,7 +241,7 @@ server <- function(input, output, session) {
         freq <- data.frame(freq,relativo)
         
         plot_ly(freq, x = reorder(freq$items, -freq$count), y = freq$count, type = "bar",
-                text = relativo, textposition = "outside",
+                text = relativo, textposition = "outside", cliponaxis = FALSE,
                 marker = list(color = "#F5CFDC")) %>%
             layout(title = "",
                    xaxis = list(title = "", tickangle = -45),
@@ -268,7 +266,7 @@ server <- function(input, output, session) {
         rela<- paste(round(100*rela,2), "%", sep="")
         
         plot_ly(freq, x = reorder(freq$size, -freq$count), y = freq$count, type = "bar",
-                text = rela, textposition = "outside",
+                text = rela, textposition = "outside", cliponaxis = FALSE,
                 marker = list(color = "#FE6B6D")) %>%
             layout(title = "",
                    xaxis = list(title = "", tickangle = -45),
@@ -388,6 +386,7 @@ server <- function(input, output, session) {
         
         df_fishers <- select(.data = df_reglas, rules, confidence, count, fishersExactTest)
         df_fishers <- df_fishers[order(df_fishers$fishersExactTest, decreasing = F),]
+        df_fishers <- filter(.data = df_fishers, df_fishers$fishersExactTest < 0.05)
         
         if(nrow(df_fishers)<10){
             top_10 <- df_fishers
@@ -410,10 +409,9 @@ server <- function(input, output, session) {
         }
         
         top_5$confidence <- round(top_5$confidence,3)
-        
         top_5 <- top_5[order(top_5$fishersExactTest),]
-        top_5$fishersExactTest <- signif(top_5$fishersExactTest, digits = 3)
-        names(top_5) <- c("Reglas", "% Conf", "Count", "P-Fisher")
+        top_5$fishersExactTest <- NULL
+        names(top_5) <- c("Reglas", "% Conf", "Count")
         
         datatable(data = top_5, rownames = F) %>%
             formatPercentage(columns = "% Conf", digits = 1)
@@ -425,10 +423,6 @@ server <- function(input, output, session) {
         reglas <- reglas()
         trans <- tr()
         
-        metricas <- interestMeasure(x = reglas, measure = c("coverage", "fishersExactTest"),
-                                    transactions = trans)
-        quality(reglas) <- cbind(quality(reglas), metricas)
-        
         cut <- unlist(strsplit(labels(reglas),"=>"))
         
         lhs <- data.frame(lhs = cut[seq(1,length(cut),2)])
@@ -439,15 +433,12 @@ server <- function(input, output, session) {
         quality <- data.frame(reglas@quality)
         conf <- data.frame(quality$confidence)
         count <- data.frame(quality$count)
-        fisher <- data.frame(quality$fishersExactTest)
-        fisher <- signif(fisher, digits = 3)
 
-        tabla <- data.frame(lhs, igual, rhs, conf, count, fisher)
-        names(tabla) <- c("Lhs", "=>", "Rhs", "% Conf", "Count", "P-Fisher")
+        tabla <- data.frame(lhs, igual, rhs, conf, count)
+        names(tabla) <- c("Lhs", "=>", "Rhs", "% Conf", "Count")
         
-        df_cov <- tabla[order(tabla$`P-Fisher`),]
 
-        return(df_cov)
+        return(tabla)
         
     })
     
@@ -478,6 +469,7 @@ server <- function(input, output, session) {
         item <- as.character(items[1])
         item <- paste("{",item,"} ", sep = "")
         item1 <- filter(.data = df_cov, Lhs == item)
+        item1 <- item1[order(item1$Count, decreasing = T),]
         
         datatable(data = item1, rownames = F) %>%
             formatPercentage(columns = "% Conf", digits = 1)
@@ -496,6 +488,7 @@ server <- function(input, output, session) {
         item <- as.character(items[2])
         item <- paste("{",item,"} ", sep = "")
         item1 <- filter(.data = df_cov, Lhs == item)
+        item1 <- item1[order(item1$Count, decreasing = T),]
         
         datatable(data = item1, rownames = F) %>%
             formatPercentage(columns = "% Conf", digits = 1)
@@ -514,6 +507,7 @@ server <- function(input, output, session) {
         item <- as.character(items[3])
         item <- paste("{",item,"} ", sep = "")
         item1 <- filter(.data = df_cov, Lhs == item)
+        item1 <- item1[order(item1$Count, decreasing = T),]
         
         datatable(data = item1, rownames = F) %>%
             formatPercentage(columns = "% Conf", digits = 1)
@@ -532,6 +526,7 @@ server <- function(input, output, session) {
         item <- as.character(items[4])
         item <- paste("{",item,"} ", sep = "")
         item1 <- filter(.data = df_cov, Lhs == item)
+        item1 <- item1[order(item1$Count, decreasing = T),]
         
         datatable(data = item1, rownames = F) %>%
             formatPercentage(columns = "% Conf", digits = 1)
@@ -550,6 +545,7 @@ server <- function(input, output, session) {
         item <- as.character(items[5])
         item <- paste("{",item,"} ", sep = "")
         item1 <- filter(.data = df_cov, Lhs == item)
+        item1 <- item1[order(item1$Count, decreasing = T),]
         
         datatable(data = item1, rownames = F) %>%
             formatPercentage(columns = "% Conf", digits = 1)
