@@ -45,9 +45,6 @@ ui <- navbarPage(
         value = "recomendaciones",
         h2("Recomendaciones para tu empresa", align = "center"),
         br(),
-        p("El Market Basket Analysis, es utilizado en la industria del 
-          retail e e-commerce para entender el comportamiento de compra 
-          de los clientes."),
         actionButton("jump3", "Continuar",
                      style="color: #fff; background-color: #1979a9",
                      align = "center"),
@@ -108,11 +105,28 @@ ui <- navbarPage(
                 
                 tabPanel(
                     title = "Market Basket",
+                    
+                    h2("Market Basket Analysis"),
+                    br(),
+                    p("El Market Basket Analysis, es utilizado en la industria del 
+                        retail e e-commerce para entender el comportamiento de compra 
+                        de los clientes. Esta metodología detecta las combinaciones de 
+                        artículos que suelen comprar al mismo tipo. "),
                     h3("Reglas de asociación"),
+                    p("Una regla de asociación se define como una implicación del tipo “si X entonces Y” (X⇒Y).
+                    Por ejemplo, la regla {Leche} => {Cereal} significa que, cuando compran Leche, también compran Cereal.
+                       El lado izquierdo de la regla recibe el nombre de antecedente (LHS) y 
+                      el lado derecho el nombre de consecuente (RHS)."),
+                    p("El porcentaje de confiabilidad es la probabilidad de que una transacción que contiene los items
+                      X, también contengan los items de Y. Por ejemplo, el 20% de las veces que se compra leche también
+                      se compra cereal."),
                     br(),
                     DT::dataTableOutput("rules"),  
                     br(),
                     h3("Comunidades de ITEMS"),
+                    p("Las gráficas son una excelente manera de visualizar las reglas utilizando círculos y flechas. Las reglas
+                      están representadas dentro los círculos. Las reglas están conectadas con sus artículos mediante flechas. De 
+                      esta manera podemos visualizar los artículos que se relacionan entre sí."),
                     br(),
                     visNetwork::visNetworkOutput("grafo", width = "100%", height = 700)
                 ),
