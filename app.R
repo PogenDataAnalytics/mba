@@ -124,16 +124,19 @@ ui <- navbarPage(
                     DT::dataTableOutput("rules"),  
                     br(),
                     h3("Comunidades de ITEMS"),
-                    p("Las gráficas son una excelente manera de visualizar las reglas utilizando círculos y flechas. Las reglas
-                      están representadas dentro los círculos. Las reglas están conectadas con sus artículos mediante flechas. De 
-                      esta manera podemos visualizar los artículos que se relacionan entre sí."),
+                    p("Las gráficas son una excelente manera de visualizar conoce los artículos que se relacionan entre sí. Las reglas
+                      están representadas dentro los círculos y estos, a su vez, están conectados con sus artículos mediante flechas."),
                     br(),
                     visNetwork::visNetworkOutput("grafo", width = "100%", height = 700)
                 ),
                 
                 tabPanel(
                     title = "Itemsets",
+                    br(),
                     h3("Itemsets más frecuentes"),
+                    br(),
+                    p("Los itemsets son el conjunto de dos o más items que aparecen en una misma regla. Conoce 
+                    los 10 itemsets más frecuentes encontrados en las reglas de asociación."),
                     br(),
                     plotlyOutput(outputId = "top10graf"),
                     br(),
@@ -141,12 +144,18 @@ ui <- navbarPage(
                 ),
                 
                 tabPanel(
-                    title = "Top Reglas",
+                    title = "Reglas recomendadas",
                     h3("Reglas con mayor probabilidad"),
+                    br(),
+                    p("Conoce las reglas de asociación que tienen una mayor probabilidad de
+                      suceder."),
                     br(),
                     DT::dataTableOutput(outputId = "reglas_prob"),
                     br(),
                     h3("Reglas de items más frecuentes"),
+                    br(),
+                    p("Conoce los artículos que suelen ser comprados junto con
+                      los items más vendidos."),
                     br(),
                     h4(textOutput(outputId = "item1_name")),
                     DT::dataTableOutput(outputId = "item1"),
