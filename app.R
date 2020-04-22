@@ -350,9 +350,6 @@ server <- function(input, output, session) {
         
         rules <- sort(rules, by = "count", decreasing = T)
         
-        rules <- rules[1:100]
-        
-        
         plot(rules, method="graph",engine = "htmlwidget")
         
         })
