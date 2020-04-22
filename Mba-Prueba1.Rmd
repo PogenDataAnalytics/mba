@@ -1,0 +1,394 @@
+---
+title: "Pogen Analytics"
+output:
+  rmdformats::material:
+    highlight: kate
+    self_contained: true
+    code_folding: show
+    thumbnails: true
+    gallery: true
+    fig_width: 4
+    fig_height: 4
+    df_print: kable
+---
+
+
+```{r knitr_init, echo=FALSE, results="asis", cache=FALSE, include=F}
+library(knitr)
+library(rmdformats)
+library(questionr)
+knitr::opts_chunk$set(echo = TRUE)
+library(shiny)
+library(arules)
+library(arulesViz)
+library(RColorBrewer)
+library(dplyr, warn.conflicts = F)
+library(lubridate, warn.conflicts = F)
+library(knitr, warn.conflicts = F)
+library(kableExtra)
+library(ggpubr)
+library(ggplot2)
+library(plyr)
+library(DT)
+library(tidyverse)
+library(readxl)
+library(plotly)
+```
+
+# Introducción
+
+## Market Basket Analysis
+
+El Market Basket Analysis, es utilizado en la industria del retail e e-commerce para entender el comportamiento de compra de los clientes. Esta metodología detecta las combinaciones de artículos que suelen comprar al mismo tipo. 
+
+Pogen Analytics pone a tu disposición 3 demos para que conozcas nuestra plataforma de Market Basket Análysis y los beneficios que puede traer a tu negocio:
+
+* Demo 1: Supermercado
+* Demo 2: Zapatería
+* Demo 3: Tienda Departamental
+
+A través de los diferentes demos podrás analisar su Market Basket Análysis y las recomendaciones que Pogen Analytics suguiere para resolver cada uno de sus casos.
+
+# Demo 1
+
+## Supermercado Intermarche {.tabset}
+
+La compra de productos de supermercado online alrededor del mundo ya es una tendencia, en México es el que tiene mayor frecuencia de compra semanal con el 23% entre todas las categorías de compra en línea. 
+
+Debido a la importancia que va cobrando la compra del súper vía online, Supermercado Intermarche busca ofrecer a sus clientes una mejor experiencia de compra ofreciendo una sección de paquetes de productos que sus clientes suelen comprar.
+
+```{r setup, include=FALSE}
+
+data <- read.csv(file = "data_supermercado.csv")
+data <- select(.data = data, BASKET_ID, COMMODITY_DESC)
+names(data) <- c("ticket","items")
+
+```
+
+### Análisis de Ventas
+
+```{r include = FALSE}
+        data$ticket <- as.character(data$ticket)
+        data$items <- as.character(data$items)
+        
+        transaction <- ddply(data,
+                             c("ticket"),
+                             function(df1)paste(df1$items, collapse = ","))
+        
+        transaction <- transaction$V1
+        
+        write.table(x = transaction,
+                    file = tmp <- file(),
+                    row.names = FALSE,
+                    quote = FALSE)
+        
+        trans <- read.transactions(file = tmp,
+                          format = "basket",
+                          sep = ",", 
+                          rm.duplicates=TRUE)
+        
+        resume <- summary(trans)
+        no_trans <- resume@Dim[1]
+        no_ticket <- resume@Dim[2]
+```
+
+Para realizar el Market Basket Análisis se utilizó una base de datos de `r no_trans` transacciones y `r no_ticket` artículos. En las siguientes gráficas se muestran los productos más vendidos y el tamaño de ticket más frecuente.
+
+**Productos más vendidos**
+
+```{r, echo=F, include=T, fig.width=7}
+        freq <- data.frame(table(data$items)) 
+        freq <- freq[order(freq$Freq, decreasing = T),]
+        total <- sum(freq$Freq)
+        freq <- freq[1:10,]
+        names(freq) <- c("items","count")
+        freq$items <- as.character(freq$items)
+        relativo <- c(rel = round(freq$count/total,4))
+        relativo <- paste(round(100*relativo,2), "%", sep="")
+        freq <- data.frame(freq,relativo)
+        
+        plot_ly(freq, x = reorder(freq$items, -freq$count), y = freq$count, type = "bar",
+                text = relativo, textposition = "outside", showlegend = F, name = " ",
+                cliponaxis = FALSE,
+                marker = list(color = "#235a79")) %>%
+            layout(title = list(tittle = ""),
+                   xaxis = list(title = "", tickangle = -45),
+                   yaxis = list(title = ""))
+```
+
+**Tamaños de tickets de compra**
+
+```{r, echo=F, include=T, fig.width=7}
+        freq <- data.frame(table(data$ticket)) 
+        freq <- freq[order(freq$Freq, decreasing = T),]
+        freq <- data.frame(table(freq$Freq))
+        freq <- freq[order(freq$Freq, decreasing = T),]
+        if(nrow(freq)>10){
+            freq <- freq[1:10,]
+        }
+        names(freq) <- c("size","count")
+        total <- sum(freq$count)
+        rela <- c(rel = round(freq$count/total,4))
+        rela<- paste(round(100*rela,2), "%", sep="")
+        
+        plot_ly(freq, x = reorder(freq$size, -freq$count), y = freq$count, type = "bar",
+                text = rela, textposition = "outside", showlegend = F, name = " ",
+                cliponaxis = FALSE,
+                marker = list(color = "#f04438")) %>%
+            layout(title = "",
+                   xaxis = list(title = "", tickangle = -45),
+                   yaxis = list(title = ""))
+```
+        
+### Market Basket
+
+```{r, echo=F, include=F}
+soporte <- 4/dim(trans)[1]
+        reglas <- apriori(data = trans,
+                          parameter = list(support = soporte,
+                                           confidence = 0.01,
+                                           minlen = 2,
+                                           maxlen = 4,
+                                           target = "rules"))
+        reglas <- reglas[is.maximal(reglas)]
+        reglas <- sort(reglas, by = "count", decreasing = T)
+```
+
+**Reglas de asociación**
+
+Una regla de asociación se define como una implicación del tipo “si X entonces Y” (X⇒Y). Por ejemplo, la regla {Leche} => {Cereal}  significa que, cuando compran Leche, también compran Cereal. El lado izquierdo de la regla recibe el nombre de antecedente (LHS) y el lado derecho el nombre de consecuente (RHS).
+
+El porcentaje de confiabilidad es la probabilidad de que una transacción que contiene los items  X, también contengan los items de Y. Por ejemplo, el 20% de las veces que se compra leche también se compra cereal.
+
+```{r, echo=F, include=T}
+top.count <- sort(reglas, by = "count", decreasing = T)
+        
+        cut <- unlist(strsplit(labels(top.count), "=>"))
+        
+        lhs <- data.frame(lhs = cut[seq(1,length(cut),2)])
+        rhs <- data.frame(rhs = cut[seq(2,length(cut),2)])
+        igual <- as.data.frame(matrix(nrow=(length(cut)/2), ncol = 1))
+        igual[,1] <- "=>"
+        names(igual) <- "=>"
+        quality <- data.frame(top.count@quality)
+        confidence <- data.frame(quality$confidence)
+        count <- data.frame(quality$count)
+        tabla <- data.frame(lhs, igual, rhs, confidence, count)
+        names(tabla) <- c("lhs","=>","rhs","% Conf", "count")
+        tabla <- tabla[order(tabla$count, decreasing = T),] %>%
+            filter(tabla$count > 3)
+        
+        datatable(data = tabla, rownames = F, options = list(pageLength = 5)) %>%
+            formatPercentage(columns = "% Conf", digits = 1)
+```
+
+**Grafo de Reglas**
+
+Las gráficas son una excelente manera de visualizar cómo los artículos que se relacionan entre sí. Las reglas están representadas dentro los círculos y estos, a su vez, están conectados con sus artículos mediante flechas.
+
+```{r, echo=F, include=T, fig.width=7}
+support <- 4/dim(trans)[1]
+        
+        rules <- apriori(data = trans,
+                         parameter = list(supp=support, conf=0.0001, minlen =2, maxlen = 4),
+                         control = list(verbose = FALSE))
+        
+        rules <- rules[is.maximal(rules)]
+        
+        rules <- sort(rules, by = "count", decreasing = T)
+        
+        plot(rules, method="graph",engine = "htmlwidget")
+```
+
+### Conjunto de productos
+
+```{r, echo=F, include=F}
+soporte <- 4/dim(trans)[1]
+        itemsets <- apriori(data = trans,
+                            parameter = list(support = soporte,
+                                             minlen = 2,
+                                             maxlen = 4,
+                                             target = "frequent itemset"))
+        
+        itemsets <- itemsets[is.maximal(itemsets)]
+        itemsets <- sort(itemsets, decreasing = T)
+
+```
+
+Los itemsets son el conjunto de dos o más productos que aparecen en una misma regla. La siguiente tabla contiene todos los Itemsets encontrados en las transacciones.
+
+```{r, echo=F, include=T}
+
+itemsets <- as(itemsets, Class = "data.frame")
+itemsets <- select(.data = itemsets, !support)
+        itemsets <- itemsets[order(itemsets$count,decreasing = T),]
+        
+        datatable(data = itemsets, rownames = F)
+```
+
+### Promociones
+
+El supermercado Intermarche tiene la oportunidad de ofrecer productos gratis en la compra de otros productos. Para poder determinar cuáles promociones tendrán mayor éxito se utilizan las reglas de asociación más confiables y frecuentes.
+
+**Promociones 2x1**
+
+Para las reglas de 2x1 se utulizarán las reglas de asociación que contengan 2 productos. 
+
+```{r, echo=F, include=T}
+soporte <- 4/dim(trans)[1]
+        reglas <- apriori(data = trans,
+                          parameter = list(support = soporte,
+                                           confidence = 0.01,
+                                           minlen = 2,
+                                           maxlen = 2,
+                                           target = "rules"),
+                          control = list(verbose=F))
+        reglas <- reglas[is.maximal(reglas)]
+        reglas <- sort(reglas, by = "count", decreasing = T)
+        
+metricas <- interestMeasure(x = reglas, measure = c("coverage", "fishersExactTest"),
+                                    transactions = trans)
+        quality(reglas) <- cbind(quality(reglas), metricas)
+        df_reglas <- as(reglas, Class = "data.frame")
+        
+        df_fishers <- select(.data = df_reglas, rules, confidence, count, fishersExactTest)
+        df_fishers <- df_fishers[order(df_fishers$fishersExactTest, decreasing = F),]
+        df_fishers <- filter(.data = df_fishers, df_fishers$fishersExactTest < 0.05)
+        names(df_fishers) <- c("rules","confidence","count","fisherExactRest")
+        
+        promo2x1 <- as.data.frame(matrix(nrow = 0, ncol = 4))
+        names(promo2x1) <- c("rules","confidence","count","fisherExactRest")
+        
+        sec <- seq(1,nrow(df_fishers),2)
+        
+        for(i in sec){
+                if(df_fishers[i,2]>df_fishers[i+1,2]){
+                        promo2x1 <- rbind(promo2x1, df_fishers[i,])
+                } else {
+                        promo2x1 <- rbind(promo2x1, df_fishers[i+1,])
+                }
+        }
+        
+        promo2x1$confidence <- round(promo2x1$confidence, 4)
+        promo2x1 <- select(.data = promo2x1, !fisherExactRest)
+        
+        datatable(data = promo2x1, rownames = F, options = list(pageLength = 5))%>%
+            formatPercentage(columns = "confidence", digits = 1)
+```
+
+**Promociones 3x2**
+
+Para obtener las promociones de 3x2 se utilizarán las reglas de asociación con 3 productos.
+
+```{r, echo=F, include=T,}
+soporte <- 4/dim(trans)[1]
+        reglas <- apriori(data = trans,
+                          parameter = list(support = soporte,
+                                           confidence = 0.01,
+                                           minlen = 3,
+                                           maxlen = 3,
+                                           target = "rules"),
+                          control = list(verbose=F))
+        reglas <- reglas[is.maximal(reglas)]
+        reglas <- sort(reglas, by = "count", decreasing = T)
+        
+metricas <- interestMeasure(x = reglas, measure = c("coverage", "fishersExactTest"),
+                                    transactions = trans)
+        quality(reglas) <- cbind(quality(reglas), metricas)
+        df_reglas <- as(reglas, Class = "data.frame")
+        
+        df_fishers <- select(.data = df_reglas, rules, confidence, count, fishersExactTest)
+        df_fishers <- df_fishers[order(df_fishers$fishersExactTest, decreasing = F),]
+        df_fishers <- filter(.data = df_fishers, df_fishers$fishersExactTest < 0.05)
+        names(df_fishers) <- c("rules","confidence","count","fisherExactRest")
+        
+        promo3x2 <- filter(.data = df_fishers, confidence == 1)
+        promo3x2$confidence <- round(promo3x2$confidence, 4)
+        
+        promo3x2 <- select(promo3x2, !fisherExactRest)
+        
+        datatable(data = promo3x2, rownames = F, options = list(pageLength = 5))%>%
+            formatPercentage(columns = "confidence", digits = 1)
+```
+
+## {-}
+
+<br />
+
+## Recomendaciones
+
+Los conjuntos de productos que se recomiendan ofrecer en la sección de tienda en línea son:
+
+* BEEF, CHEESE, DRY SAUCES/GRAVY, SOFT DRINKS, VEGETABLES - SHELF STABLE
+* BEEF, CHEESE, CRACKERS/MISC BKD FD, DRY SAUCES/GRAVY, VEGETABLES - SHELF STABLE
+* CHEESE, CRACKERS/MISC BKD FD, SOFT DRINKS
+* COOKIES/CONES, ICE CREAM/MILK/SHERBTS, SOFT DRINKS
+* BAKED BREAD/BUNS/ROLLS, CHEESE, DELI MEATS, SOFT DRINKS
+* BAKED BREAD/BUNS/ROLLS, CHEESE, LUNCHMEAT, SOFT DRINKS
+
+Promociones 2x1 recomendadas:
+
+* VEGETABLES - SHELF STABLE => DRY SAUCES/GRAVY	
+* VEGETABLES - SHELF STABLE => BEEF	
+* DELI MEATS => BAKED BREAD/BUNS/ROLLS	
+* COOKIES/CONES => ICE CREAM/MILK/SHERBTS	
+* BEEF => DRY SAUCES/GRAVY	
+* SHORTENING/OIL => EGGS	
+* BEEF => CHEESE	
+* CRACKERS/MISC BKD FD => CHEESE	
+* VEGETABLES - SHELF STABLE => CHEESE	
+* CRACKERS/MISC BKD FD => VEGETABLES - SHELF STABLE	
+
+Promociones 3x2 recomendadas:
+
+* {BEEF,DRY SAUCES/GRAVY} => {VEGETABLES - SHELF STABLE}	
+* {BEEF,VEGETABLES - SHELF STABLE} => {DRY SAUCES/GRAVY}	
+* {CHEESE,DRY SAUCES/GRAVY} => {VEGETABLES - SHELF STABLE}	
+* {SOFT DRINKS,VEGETABLES - SHELF STABLE} => {DRY SAUCES/GRAVY}	
+* {CHEESE,VEGETABLES - SHELF STABLE} => {BEEF}	
+* {CHEESE,DRY SAUCES/GRAVY} => {BEEF}	
+* {CHEESE,VEGETABLES - SHELF STABLE} => {DRY SAUCES/GRAVY}	
+* {DELI MEATS,SOFT DRINKS} => {BAKED BREAD/BUNS/ROLLS}	
+* {CRACKERS/MISC BKD FD,DRY SAUCES/GRAVY} => {VEGETABLES - SHELF STABLE}	
+* {BEEF,CRACKERS/MISC BKD FD} => {VEGETABLES - SHELF STABLE}	
+
+# Demo 2
+
+## Zapateria Amie {.tabset}
+
+La compra de productos de supermercado online alrededor del mundo ya es una tendencia, en México es el que tiene mayor frecuencia de compra semanal con el 23% entre todas las categorías de compra en línea. 
+
+Debido a la importancia que va cobrando la compra del súper vía online, Supermercado Intermarche busca ofrecer a sus clientes una mejor experiencia de compra ofreciendo una sección de paquetes de productos que sus clientes suelen comprar.
+
+### Análisis de Ventas
+
+### Market Basket
+
+### Itemsets
+
+### Reglas de asociacion
+
+## {-}
+
+### Recomendaciones
+
+# Demo 3
+
+## Sport Tienda {.tabset}
+
+La compra de productos de supermercado online alrededor del mundo ya es una tendencia, en México es el que tiene mayor frecuencia de compra semanal con el 23% entre todas las categorías de compra en línea. 
+
+Debido a la importancia que va cobrando la compra del súper vía online, Supermercado Intermarche busca ofrecer a sus clientes una mejor experiencia de compra ofreciendo una sección de paquetes de productos que sus clientes suelen comprar.
+
+### Análisis de Ventas
+
+### Market Basket
+
+### Itemsets
+
+### Reglas de asociacion
+
+## {-}
+
+### Recomendaciones
+
