@@ -59,7 +59,7 @@ Debido a la importancia que va cobrando la compra del súper vía online, Superm
 
 ```{r setup, include=FALSE}
 
-data <- read.csv(file = "data_supermercado.csv")
+data <- read.csv(file = "data_super_esp.csv")
 data <- select(.data = data, BASKET_ID, COMMODITY_DESC)
 names(data) <- c("ticket","items")
 
@@ -186,7 +186,7 @@ top.count <- sort(reglas, by = "count", decreasing = T)
 
 Las gráficas son una excelente manera de visualizar cómo los artículos que se relacionan entre sí. Las reglas están representadas dentro los círculos y estos, a su vez, están conectados con sus artículos mediante flechas.
 
-```{r, echo=F, include=T, fig.width=7}
+```{r, echo=F, include=T, fig.width=7, warning=F}
 support <- 4/dim(trans)[1]
         
         rules <- apriori(data = trans,
@@ -206,8 +206,7 @@ support <- 4/dim(trans)[1]
 soporte <- 4/dim(trans)[1]
         itemsets <- apriori(data = trans,
                             parameter = list(support = soporte,
-                                             minlen = 2,
-                                             maxlen = 4,
+                                             minlen = 3,
                                              target = "frequent itemset"))
         
         itemsets <- itemsets[is.maximal(itemsets)]
@@ -319,38 +318,27 @@ metricas <- interestMeasure(x = reglas, measure = c("coverage", "fishersExactTes
 
 Los conjuntos de productos que se recomiendan ofrecer en la sección de tienda en línea son:
 
-* BEEF, CHEESE, DRY SAUCES/GRAVY, SOFT DRINKS, VEGETABLES - SHELF STABLE
-* BEEF, CHEESE, CRACKERS/MISC BKD FD, DRY SAUCES/GRAVY, VEGETABLES - SHELF STABLE
-* CHEESE, CRACKERS/MISC BKD FD, SOFT DRINKS
-* COOKIES/CONES, ICE CREAM/MILK/SHERBTS, SOFT DRINKS
-* BAKED BREAD/BUNS/ROLLS, CHEESE, DELI MEATS, SOFT DRINKS
-* BAKED BREAD/BUNS/ROLLS, CHEESE, LUNCHMEAT, SOFT DRINKS
+* {GRAVY,QUESO,RES,VERDURAS}
+* {BEBIDAS,GRAVY,RES,VERDURAS}
+* {BEBIDAS,FRUTA}
+* {CARNE,SNACKS}
+* {BEBIDAS,GRAVY,QUESO,VERDURAS}
 
 Promociones 2x1 recomendadas:
 
-* VEGETABLES - SHELF STABLE => DRY SAUCES/GRAVY	
-* VEGETABLES - SHELF STABLE => BEEF	
-* DELI MEATS => BAKED BREAD/BUNS/ROLLS	
-* COOKIES/CONES => ICE CREAM/MILK/SHERBTS	
-* BEEF => DRY SAUCES/GRAVY	
-* SHORTENING/OIL => EGGS	
-* BEEF => CHEESE	
-* CRACKERS/MISC BKD FD => CHEESE	
-* VEGETABLES - SHELF STABLE => CHEESE	
-* CRACKERS/MISC BKD FD => VEGETABLES - SHELF STABLE	
+* {VERDURAS} => {GRAVY}
+* {VERDURAS} => {RES}	
+* {EMBUTIDOS} => {PAN}	
+* {CONOS} => {HELADO}	
+* {RES} => {GRAVY}	
 
 Promociones 3x2 recomendadas:
 
-* {BEEF,DRY SAUCES/GRAVY} => {VEGETABLES - SHELF STABLE}	
-* {BEEF,VEGETABLES - SHELF STABLE} => {DRY SAUCES/GRAVY}	
-* {CHEESE,DRY SAUCES/GRAVY} => {VEGETABLES - SHELF STABLE}	
-* {SOFT DRINKS,VEGETABLES - SHELF STABLE} => {DRY SAUCES/GRAVY}	
-* {CHEESE,VEGETABLES - SHELF STABLE} => {BEEF}	
-* {CHEESE,DRY SAUCES/GRAVY} => {BEEF}	
-* {CHEESE,VEGETABLES - SHELF STABLE} => {DRY SAUCES/GRAVY}	
-* {DELI MEATS,SOFT DRINKS} => {BAKED BREAD/BUNS/ROLLS}	
-* {CRACKERS/MISC BKD FD,DRY SAUCES/GRAVY} => {VEGETABLES - SHELF STABLE}	
-* {BEEF,CRACKERS/MISC BKD FD} => {VEGETABLES - SHELF STABLE}	
+* {GRAVY,RES} => {VERDURAS}	
+* {RES,VERDURAS} => {GRAVY}	
+* {GRAVY,QUESO} => {VERDURAS}	
+* {BEBIDAS,VERDURAS} => {GRAVY}	
+* {QUESO,VERDURAS} => {RES}	
 
 # Demo 2
 
