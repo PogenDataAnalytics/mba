@@ -55,7 +55,9 @@ A través de los diferentes demos podrás analisar su Market Basket Análysis y 
 
 La compra de productos de supermercado online alrededor del mundo ya es una tendencia, en México es el que tiene mayor frecuencia de compra semanal con el 23% entre todas las categorías de compra en línea. 
 
-Debido a la importancia que va cobrando la compra del súper vía online, Supermercado Intermarche busca ofrecer a sus clientes una mejor experiencia de compra agregando a su portal una sección donde sus clientes puedan comprar paquetes de productos recomendados.
+Debido a la importancia que va cobrando la compra del supermercado vía online, Supermercado Intermarche busca ofrecer a sus clientes una mejor experiencia de compra agregando a su portal una sección donde sus clientes puedan comprar paquetes de productos recomendados.
+
+Además busca una solución para generar sus ofertas de 2x1 y 3x2 de acuerdo al comportamiento de sus clientes, asegurando asi su éxito. 
 
 ```{r , include=FALSE}
 
@@ -92,7 +94,7 @@ names(data) <- c("ticket","items")
         no_ticket <- resume@Dim[2]
 ```
 
-Para realizar el Market Basket Análisis se utilizó una base de datos de `r no_trans` transacciones y `r no_ticket` artículos. En las siguientes gráficas se muestran los productos más vendidos y el tamaño de ticket más frecuente.
+Para realizar el Market Basket Análisis se utilizó una base de datos de `r no_trans` transacciones y `r no_ticket` artículos, el cual representa una semana de ventas del supermercado.
 
 **Productos más vendidos**
 
@@ -200,7 +202,11 @@ support <- 4/dim(trans)[1]
         plot(rules, method="graph",engine = "htmlwidget")
 ```
 
-### Conjunto de productos
+### Solución 1
+
+**Conjunto de productos**
+
+Supermercado Intermarché puede recomendar a sus clientes agregar a su carrito de compra un conjunto de artículos con un solo click, de esta manera se simplifica el proceso de estar agregando artículos por artículo.
 
 ```{r, echo=F, include=F}
 soporte <- 4/dim(trans)[1]
@@ -214,7 +220,6 @@ soporte <- 4/dim(trans)[1]
 
 ```
 
-Los itemsets son el conjunto de dos o más productos que aparecen en una misma regla. La siguiente tabla contiene todos los Itemsets encontrados en las transacciones.
 
 ```{r, echo=F, include=T, out.width="100%"}
 
@@ -225,13 +230,13 @@ itemsets <- select(.data = itemsets, !support)
         datatable(data = itemsets, rownames = F)
 ```
 
-### Promociones
+### Solución 2
 
 El supermercado Intermarche tiene la oportunidad de ofrecer productos gratis en la compra de otros productos. Para poder determinar cuáles promociones tendrán mayor éxito se utilizan las reglas de asociación más confiables y frecuentes.
 
 **Promociones 2x1**
 
-Para las reglas de 2x1 se utulizarán las reglas de asociación que contengan 2 productos. 
+Las promociones 2x1 que supermercado Intermarché puede ofrecer son:
 
 ```{r, echo=F, include=T, out.width="100%"}
 soporte <- 4/dim(trans)[1]
@@ -277,7 +282,7 @@ metricas <- interestMeasure(x = reglas, measure = c("coverage", "fishersExactTes
 
 **Promociones 3x2**
 
-Para obtener las promociones de 3x2 se utilizarán las reglas de asociación con 3 productos.
+Las promociones 3x2 que el supermercados Intermarché puede ofrecer son:
 
 ```{r, echo=F, include=T, out.width="100%"}
 soporte <- 4/dim(trans)[1]
@@ -312,39 +317,14 @@ metricas <- interestMeasure(x = reglas, measure = c("coverage", "fishersExactTes
 
 ## {-}
 
-<br />
-
-## Recomendaciones
-
-Los conjuntos de productos que se recomiendan ofrecer en la sección de tienda en línea son:
-
-* {BEBIDAS,GRAVY,QUESO,RES,VERDURAS}
-* {BEBIDAS,PAN,SNACKS}
-* {BEBIDAS,QUESO,SNACKS}
-* {GALLETAS,GRAVY,QUESO,RES,VERDURAS}
-* {BEBIDAS,PAN,PIZZA CONGELADA}
-
-Promociones 2x1 recomendadas:
-
-* {VERDURAS} => {GRAVY}
-* {VERDURAS} => {RES}	
-* {EMBUTIDOS} => {PAN}	
-* {CONOS} => {HELADO}	
-* {RES} => {GRAVY}	
-
-Promociones 3x2 recomendadas:
-
-* {GRAVY,RES} => {VERDURAS}	
-* {RES,VERDURAS} => {GRAVY}	
-* {GRAVY,QUESO} => {VERDURAS}	
-* {BEBIDAS,VERDURAS} => {GRAVY}	
-* {QUESO,VERDURAS} => {RES}	
 
 # Demo 2
 
 ## Zapateria Ivonne {.tabset}
 
-La tienda departamental Action Sports busca renovar sus diferentes secursales, de acuerdo al comportamiento de compra de sus clientes. De esta manera, el cliente encontrará los artículos que más compra cerca uno del otro, además de ofrecer artículos de interes alrededor. 
+La zapateria Ivonne cuenta con 20 sucursales a nivel nacional, y busca ofrecer a sus vendedores de piso una plataforma donde puedan visualizar la relación que hay entre productos, de esta manera ellos puedan conocer qué artículos ofrecer de acuerdo al modelo que su cliente está a punto de comprar y asi aumentar sus tamaños de ticket de venta.
+
+Además busca una solución para generar promociones entre accesorios y zapatos de acuerdo al comportamiento de sus clientes. 
 
 ```{r , include=FALSE}
 
@@ -381,7 +361,7 @@ names(data) <- c("ticket","items")
         no_ticket <- resume@Dim[2]
 ```
 
-Para realizar el Market Basket Análisis se utilizó una base de datos de `r no_trans` transacciones y `r no_ticket` artículos. En las siguientes gráficas se muestran los productos más vendidos y el tamaño de ticket más frecuente.
+Para realizar el Market Basket Análisis se utilizó una base de datos de `r no_trans` transacciones y `r no_ticket` artículos, que corresponden a las ventas del 2019 en una de las sucursales. En las siguientes gráficas se muestran los productos más vendidos y el tamaño de ticket más frecuente.
 
 **Productos más vendidos**
 
@@ -446,9 +426,9 @@ soporte <-50/dim(trans)[1]
 
 **Reglas de asociación**
 
-Una regla de asociación se define como una implicación del tipo “si X entonces Y” (X⇒Y). Por ejemplo, la regla {Futbol} => {Calzado}  significa que, cuando compran Leche, también compran Cereal. El lado izquierdo de la regla recibe el nombre de antecedente (LHS) y el lado derecho el nombre de consecuente (RHS).
+Una regla de asociación se define como una implicación del tipo “si X entonces Y” (X⇒Y). Por ejemplo, la regla {Tenis} => {Agujetas}  significa que, cuando compran Tenis, también compran Agujetas. El lado izquierdo de la regla recibe el nombre de antecedente (LHS) y el lado derecho el nombre de consecuente (RHS).
 
-El porcentaje de confiabilidad es la probabilidad de que una transacción que contiene los items  X, también contengan los items de Y. Por ejemplo, el 20% de las veces que se compra Futbol también se compra Calzado.
+El porcentaje de confiabilidad es la probabilidad de que una transacción que contiene los items  X, también contengan los items de Y. Por ejemplo, el 20% de las veces que se compra Tenis también se compra Agujetas.
 
 ```{r, echo=F, include=T, out.width="100%"}
 top.count <- sort(reglas, by = "count", decreasing = T)
@@ -490,125 +470,94 @@ support <- 10/dim(trans)[1]
         plot(rules, method="graph",engine = "htmlwidget")
 ```
 
-### Conjunto de productos
+### Solución 1
 
-```{r, echo=F, include=F}
-soporte <- 10/dim(trans)[1]
+**Plataforma de venta**
+
+Los vendedores de piso son los empleados que más deben estar informados del comportamiento de sus clientes y de esta manera impulsar sus ventas. El/Ella puede ir a su plataforma y teclear el tipo de zapato que su cliente se está llevando y saber que otro producto ofrecerle.
+
+La clienta de Carolina se está probando Tenis por lo tanto le debe ofrecer:
+```{r, echo=F, include=T, out.width="100%"}
+soporte <- 1/dim(trans)[1]
         itemsets <- apriori(data = trans,
                             parameter = list(support = soporte,
-                                             minlen = 3,
-                                             target = "frequent itemset"))
-        
-        itemsets <- itemsets[is.maximal(itemsets)]
+                                             confidence = 0.01,
+                                             minlen = 2,
+                                             maxlen = 2),
+                            appearance = list(default = "rhs",lhs="TENIS"),
+                            control = list(verbose=F))
+      
         itemsets <- sort(itemsets, decreasing = T)
-
-```
-
-Los itemsets son el conjunto de dos o más productos que aparecen en una misma regla. La siguiente tabla contiene todos los Itemsets encontrados en las transacciones.
-
-```{r, echo=F, include=T, out.width="100%"}
-
-itemsets <- as(itemsets, Class = "data.frame")
-itemsets <- select(.data = itemsets, !support)
-        itemsets <- itemsets[order(itemsets$count,decreasing = T),]
         
-        datatable(data = itemsets, rownames = F)
+        itemsets <- as(itemsets, Class = "data.frame")
+        itemsets <- select(.data = itemsets, rules, confidence, count)
+        itemsets$confidence <- round(itemsets$confidence,4)
+        itemsets <- itemsets[order(itemsets$count,decreasing = T),]
+        itemsets <- itemsets[c(1,2,5),]
+        
+        datatable(data = itemsets, rownames = F)%>%
+          formatPercentage(columns = "confidence", digits = 1)
 ```
 
-### Promociones
+La clienta de Eduardo se está probando unas balerinas, por lo tanto debe de ofrecer:
+```{r, echo=F, include=T, out.width="100%"}
+soporte <- 1/dim(trans)[1]
+        itemsets <- apriori(data = trans,
+                            parameter = list(support = soporte,
+                                             confidence = 0.01,
+                                             minlen = 2,
+                                             maxlen = 2),
+                            appearance = list(default = "rhs",lhs="BALERINAS"),
+                            control = list(verbose=F))
+      
+        itemsets <- sort(itemsets, decreasing = T)
+        
+        itemsets <- as(itemsets, Class = "data.frame")
+        itemsets <- select(.data = itemsets, rules, confidence, count)
+        itemsets$confidence <- round(itemsets$confidence,4)
+        itemsets <- itemsets[order(itemsets$count,decreasing = T),]
+        itemsets <- itemsets[c(1,4,6),]
+        
+        datatable(data = itemsets, rownames = F)%>%
+          formatPercentage(columns = "confidence", digits = 1)
+```
 
-El supermercado Intermarche tiene la oportunidad de ofrecer descuentos en la compra de otros productos. Para poder determinar cuáles promociones tendrán mayor éxito se utilizan las reglas de asociación más confiables y frecuentes.
+### Solucion 2
 
-**Promociones 2x1**
+**Promociones Zapatos-Accesorios**
 
-Para las reglas de descuentos entre 2 divisiones de productos se utilizan las reglas de asociación de 2 items.
+La zapateria Ivonne ha tenido gran exito en su venta de accesorios y busca generar una promoción donde sus clientes compren Zapatos y obtengan un accesorio en descuento o gratis. Las mejores 10 combinaciones de productos que el analisis arrojó fueron las siguientes.
 
 ```{r, echo=F, include=T, out.width="100%"}
-soporte <-50/dim(trans)[1]
+accesorios <- c("AGUJETAS","BOLSA","COSMETIQUERA","LENTES","LLAVERO","MOCHILA","MONEDERO","PERFUME","PLANTILLAS")
+soporte <-1/dim(trans)[1]
         reglas <- apriori(data = trans,
                           parameter = list(support = soporte,
                                            confidence = 0.01,
                                            minlen = 2,
-                                           maxlen = 2,
-                                           target = "rules"),
+                                           maxlen = 2),
+                          appearance = list(default="lhs",rhs = accesorios),
                           control = list(verbose=F))
         reglas <- reglas[is.maximal(reglas)]
-        reglas <- sort(reglas, by = "count", decreasing = T)
+        promo2x1 <- sort(reglas, by = "count", decreasing = T)
         
-metricas <- interestMeasure(x = reglas, measure = c("coverage", "fishersExactTest"),
-                                    transactions = trans)
-        quality(reglas) <- cbind(quality(reglas), metricas)
-        df_reglas <- as(reglas, Class = "data.frame")
+        promo2x1 <- as(promo2x1, Class = "data.frame")
+        promo2x1 <- select(.data = promo2x1, rules, confidence, count)
+        promo2x1 <- promo2x1[1:10,]
         
-        df_fishers <- select(.data = df_reglas, rules, confidence, count, fishersExactTest)
-        df_fishers <- df_fishers[order(df_fishers$fishersExactTest, decreasing = F),]
-        names(df_fishers) <- c("rules","confidence","count","fisherExactRest")
-        
-        promo2x1 <- as.data.frame(matrix(nrow = 0, ncol = 4))
-        names(promo2x1) <- c("rules","confidence","count","fisherExactRest")
-        
-        sec <- seq(1,nrow(df_fishers),2)
-        
-        for(i in sec){
-                if(df_fishers[i,2]>df_fishers[i+1,2]){
-                        promo2x1 <- rbind(promo2x1, df_fishers[i,])
-                } else {
-                        promo2x1 <- rbind(promo2x1, df_fishers[i+1,])
-                }
-        }
-        
-        promo2x1$confidence <- round(promo2x1$confidence, 4)
-        promo2x1 <- select(.data = promo2x1, !fisherExactRest)
-        
-        datatable(data = promo2x1, rownames = F, options = list(pageLength = 5))%>%
-            formatPercentage(columns = "confidence", digits = 1)
-```
-
-**Promociones 3x2**
-
-Para obtener las promociones de compar 2 productos y llevarte 1 a mitad de precio o gratis se utilizan reglas de asociación de 3 items.
-
-```{r, echo=F, include=T, out.width="100%"}
-soporte <- 10/dim(trans)[1]
-        reglas <- apriori(data = trans,
-                          parameter = list(support = soporte,
-                                           confidence = 0.01,
-                                           minlen = 3,
-                                           maxlen = 3,
-                                           target = "rules"),
-                          control = list(verbose=F))
-        reglas <- reglas[is.maximal(reglas)]
-        reglas <- sort(reglas, by = "count", decreasing = T)
-        
-metricas <- interestMeasure(x = reglas, measure = c("coverage", "fishersExactTest"),
-                                    transactions = trans)
-        quality(reglas) <- cbind(quality(reglas), metricas)
-        df_reglas <- as(reglas, Class = "data.frame")
-        
-        df_fishers <- select(.data = df_reglas, rules, confidence, count, fishersExactTest)
-        df_fishers <- df_fishers[order(df_fishers$fishersExactTest, decreasing = F),]
-        names(df_fishers) <- c("rules","confidence","count","fisherExactRest")
-        
-        promo3x2 <- df_fishers
-        promo3x2$confidence <- round(promo3x2$confidence, 4)
-        
-        promo3x2 <- select(promo3x2, !fisherExactRest)
-        
-        datatable(data = promo3x2, rownames = F, options = list(pageLength = 5))%>%
+        datatable(data = promo2x1, rownames = F)%>%
             formatPercentage(columns = "confidence", digits = 1)
 ```
 
 ## {-}
 
-<br />
-
-## Recomendaciones
-
 # Demo 3
 
 ## Sport Tienda {.tabset}
 
-La tienda departamental Action Sports busca renovar sus diferentes secursales, de acuerdo al comportamiento de compra de sus clientes. De esta manera, el cliente encontrará los artículos que más compra cerca uno del otro, además de ofrecer artículos de interes alrededor. 
+La tienda departamental Action Sports busca renovar sus diferentes sucursales físicas y online, de acuerdo al comportamiento de compra de sus clientes. De esta manera, el cliente encontrará los artículos que más compra cerca uno del otro, además de ofrecer artículos de interes alrededor. 
+
+Además, busca una manera eficiente de disminuir sus inventarios cuando se acaba una temporada de Primavera-Verano o Otoño-Invierno creando promociones tanto para tiendas físicas como online.
 
 ```{r , include=FALSE}
 
@@ -754,7 +703,7 @@ support <- 100/dim(trans)[1]
         plot(rules, method="graph",engine = "htmlwidget")
 ```
 
-### Conjunto de productos
+### Solución 1
 
 ```{r, echo=F, include=F}
 soporte <- 100/dim(trans)[1]
@@ -768,103 +717,78 @@ soporte <- 100/dim(trans)[1]
 
 ```
 
-Los itemsets son el conjunto de dos o más productos que aparecen en una misma regla. La siguiente tabla contiene todos los Itemsets encontrados en las transacciones.
+*Pendiente todavía de procesar los datos.*
+
+### Solución 2
+
+Los productos que Action Sport busca agotar en sus intentarios son: Yoga, Deporte Acuático y Futbol Americano. Su estrategia es ofrecer estos productos en descuento en la compra de otro producto. La combinaciones de promociones se basará en el comportamiento de sus ventas durante la temporada.
+
+**YOGA**
 
 ```{r, echo=F, include=T, out.width="100%"}
-
-itemsets <- as(itemsets, Class = "data.frame")
-itemsets <- select(.data = itemsets, !support)
-        itemsets <- itemsets[order(itemsets$count,decreasing = T),]
-        
-        datatable(data = itemsets, rownames = F)
-```
-
-### Promociones
-
-El supermercado Intermarche tiene la oportunidad de ofrecer descuentos en la compra de otros productos. Para poder determinar cuáles promociones tendrán mayor éxito se utilizan las reglas de asociación más confiables y frecuentes.
-
-**Promociones 2x1**
-
-Para las reglas de descuentos entre 2 divisiones de productos se utilizan las reglas de asociación de 2 items.
-
-```{r, echo=F, include=T, out.width="100%"}
-soporte <-300/dim(trans)[1]
+soporte <-1/dim(trans)[1]
         reglas <- apriori(data = trans,
                           parameter = list(support = soporte,
                                            confidence = 0.01,
                                            minlen = 2,
-                                           maxlen = 2,
-                                           target = "rules"),
+                                           maxlen = 2),
+                          appearance = list(default="rhs",lhs = "YOGA"),
                           control = list(verbose=F))
-        reglas <- reglas[is.maximal(reglas)]
-        reglas <- sort(reglas, by = "count", decreasing = T)
+       reglas <- reglas[is.maximal(reglas)] 
+        promo2x1 <- sort(reglas, by = "count", decreasing = T)
         
-metricas <- interestMeasure(x = reglas, measure = c("coverage", "fishersExactTest"),
-                                    transactions = trans)
-        quality(reglas) <- cbind(quality(reglas), metricas)
-        df_reglas <- as(reglas, Class = "data.frame")
+        promo2x1 <- as(promo2x1, Class = "data.frame")
+        promo2x1 <- select(.data = promo2x1, rules, confidence, count)
+        promo2x1 <- promo2x1[1:5,]
         
-        df_fishers <- select(.data = df_reglas, rules, confidence, count, fishersExactTest)
-        df_fishers <- df_fishers[order(df_fishers$fishersExactTest, decreasing = F),]
-        names(df_fishers) <- c("rules","confidence","count","fisherExactRest")
-        
-        promo2x1 <- as.data.frame(matrix(nrow = 0, ncol = 4))
-        names(promo2x1) <- c("rules","confidence","count","fisherExactRest")
-        
-        sec <- seq(1,nrow(df_fishers),2)
-        
-        for(i in sec){
-                if(df_fishers[i,2]>df_fishers[i+1,2]){
-                        promo2x1 <- rbind(promo2x1, df_fishers[i,])
-                } else {
-                        promo2x1 <- rbind(promo2x1, df_fishers[i+1,])
-                }
-        }
-        
-        promo2x1$confidence <- round(promo2x1$confidence, 4)
-        promo2x1 <- select(.data = promo2x1, !fisherExactRest)
-        
-        datatable(data = promo2x1, rownames = F, options = list(pageLength = 5))%>%
+        datatable(data = promo2x1, rownames = F)%>%
             formatPercentage(columns = "confidence", digits = 1)
 ```
 
-**Promociones 3x2**
-
-Para obtener las promociones de compar 2 productos y llevarte 1 a mitad de precio o gratis se utilizan reglas de asociación de 3 items.
+**DEPORTE ACUATICO**
 
 ```{r, echo=F, include=T, out.width="100%"}
-soporte <- 100/dim(trans)[1]
+soporte <-1/dim(trans)[1]
         reglas <- apriori(data = trans,
                           parameter = list(support = soporte,
                                            confidence = 0.01,
-                                           minlen = 3,
-                                           maxlen = 3,
-                                           target = "rules"),
+                                           minlen = 2,
+                                           maxlen = 2),
+                          appearance = list(default="rhs",lhs = "DEPORTE ACUATICO"),
                           control = list(verbose=F))
-        reglas <- reglas[is.maximal(reglas)]
-        reglas <- sort(reglas, by = "count", decreasing = T)
+       reglas <- reglas[is.maximal(reglas)] 
+        promo2x1 <- sort(reglas, by = "count", decreasing = T)
         
-metricas <- interestMeasure(x = reglas, measure = c("coverage", "fishersExactTest"),
-                                    transactions = trans)
-        quality(reglas) <- cbind(quality(reglas), metricas)
-        df_reglas <- as(reglas, Class = "data.frame")
+        promo2x1 <- as(promo2x1, Class = "data.frame")
+        promo2x1 <- select(.data = promo2x1, rules, confidence, count)
+        promo2x1 <- promo2x1[1:5,]
         
-        df_fishers <- select(.data = df_reglas, rules, confidence, count, fishersExactTest)
-        df_fishers <- df_fishers[order(df_fishers$fishersExactTest, decreasing = F),]
-        names(df_fishers) <- c("rules","confidence","count","fisherExactRest")
+        datatable(data = promo2x1, rownames = F)%>%
+            formatPercentage(columns = "confidence", digits = 1)
+```
+
+**FUTBOL AMERICANO**
+
+```{r, echo=F, include=T, out.width="100%"}
+soporte <-1/dim(trans)[1]
+        reglas <- apriori(data = trans,
+                          parameter = list(support = soporte,
+                                           confidence = 0.01,
+                                           minlen = 2,
+                                           maxlen = 2),
+                          appearance = list(default="rhs",lhs = "FUTBOL AMERICANO"),
+                          control = list(verbose=F))
+       reglas <- reglas[is.maximal(reglas)] 
+        promo2x1 <- sort(reglas, by = "count", decreasing = T)
         
-        promo3x2 <- df_fishers
-        promo3x2$confidence <- round(promo3x2$confidence, 4)
+        promo2x1 <- as(promo2x1, Class = "data.frame")
+        promo2x1 <- select(.data = promo2x1, rules, confidence, count)
+        promo2x1 <- promo2x1[1:5,]
         
-        promo3x2 <- select(promo3x2, !fisherExactRest)
-        
-        datatable(data = promo3x2, rownames = F, options = list(pageLength = 5))%>%
+        datatable(data = promo2x1, rownames = F)%>%
             formatPercentage(columns = "confidence", digits = 1)
 ```
 
 ## {-}
 
-<br />
-
-## Recomendaciones
 
