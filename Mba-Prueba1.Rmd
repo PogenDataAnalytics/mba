@@ -61,8 +61,8 @@ Además busca una solución para generar sus ofertas de 2x1 y 3x2 de acuerdo al 
 
 ```{r , include=FALSE}
 
-data <- read.csv(file = "data_super_esp.csv")
-data <- select(.data = data, BASKET_ID, COMMODITY_DESC)
+data <- read.csv(file = "data_super.csv")
+#data <- select(.data = data, BASKET_ID, COMMODITY_DESC)
 names(data) <- c("ticket","items")
 
 ```
@@ -145,15 +145,15 @@ Para realizar el Market Basket Análisis se utilizó una base de datos de `r no_
 ### Market Basket
 
 ```{r, echo=F, include=F}
-soporte <- 4/dim(trans)[1]
+soporte <- 100/dim(trans)[1]
         reglas <- apriori(data = trans,
                           parameter = list(support = soporte,
-                                           confidence = 0.01,
+                                           confidence = 0.2,
                                            minlen = 2,
                                            maxlen = 4,
                                            target = "rules"))
         reglas <- reglas[is.maximal(reglas)]
-        reglas <- sort(reglas, by = "count", decreasing = T)
+        reglas <- sort(reglas, by = "lift", decreasing = T)
 ```
 
 **Reglas de asociación**
@@ -163,7 +163,7 @@ Una regla de asociación se define como una implicación del tipo “si X entonc
 El porcentaje de confiabilidad es la probabilidad de que una transacción que contiene los items  X, también contengan los items de Y. Por ejemplo, el 20% de las veces que se compra leche también se compra cereal.
 
 ```{r, echo=F, include=T, out.width="100%"}
-top.count <- sort(reglas, by = "count", decreasing = T)
+top.count <- sort(reglas, by = "lift", decreasing = T)
         
         cut <- unlist(strsplit(labels(top.count), "=>"))
         
@@ -177,8 +177,7 @@ top.count <- sort(reglas, by = "count", decreasing = T)
         count <- data.frame(quality$count)
         tabla <- data.frame(lhs, igual, rhs, confidence, count)
         names(tabla) <- c("lhs","=>","rhs","% Conf", "count")
-        tabla <- tabla[order(tabla$count, decreasing = T),] %>%
-            filter(tabla$count > 3)
+        tabla <- tabla[order(tabla$count, decreasing = T),]
         
         datatable(data = tabla, rownames = F, options = list(pageLength = 5)) %>%
             formatPercentage(columns = "% Conf", digits = 1)
@@ -189,15 +188,15 @@ top.count <- sort(reglas, by = "count", decreasing = T)
 Las gráficas son una excelente manera de visualizar cómo los artículos que se relacionan entre sí. Las reglas están representadas dentro los círculos y estos, a su vez, están conectados con sus artículos mediante flechas.
 
 ```{r, echo=F, include=T, fig.width=7, warning=F, , out.width="100%"}
-support <- 4/dim(trans)[1]
+support <- 50/dim(trans)[1]
         
         rules <- apriori(data = trans,
-                         parameter = list(supp=support, conf=0.0001, minlen =2, maxlen = 4),
+                         parameter = list(supp=support, conf=0.2, minlen =2, maxlen = 4),
                          control = list(verbose = FALSE))
         
         rules <- rules[is.maximal(rules)]
         
-        rules <- sort(rules, by = "count", decreasing = T)
+        rules <- sort(rules, by = "lift", decreasing = T)
         
         plot(rules, method="graph",engine = "htmlwidget")
 ```
@@ -209,7 +208,7 @@ support <- 4/dim(trans)[1]
 Supermercado Intermarché puede recomendar a sus clientes agregar a su carrito de compra un conjunto de artículos con un solo click, de esta manera se simplifica el proceso de estar agregando artículos por artículo.
 
 ```{r, echo=F, include=F}
-soporte <- 4/dim(trans)[1]
+soporte <- 32/dim(trans)[1]
         itemsets <- apriori(data = trans,
                             parameter = list(support = soporte,
                                              minlen = 3,
@@ -239,10 +238,10 @@ El supermercado Intermarche tiene la oportunidad de ofrecer productos gratis en 
 Las promociones 2x1 que supermercado Intermarché puede ofrecer son:
 
 ```{r, echo=F, include=T, out.width="100%"}
-soporte <- 4/dim(trans)[1]
+soporte <- 100/dim(trans)[1]
         reglas <- apriori(data = trans,
                           parameter = list(support = soporte,
-                                           confidence = 0.01,
+                                           confidence = 0.2,
                                            minlen = 2,
                                            maxlen = 2,
                                            target = "rules"),
@@ -284,8 +283,8 @@ metricas <- interestMeasure(x = reglas, measure = c("coverage", "fishersExactTes
 
 Las promociones 3x2 que el supermercados Intermarché puede ofrecer son:
 
-```{r, echo=F, include=T, out.width="100%"}
-soporte <- 4/dim(trans)[1]
+```{r, echo=F, include=T, out.width="100%", warning=F }
+soporte <- 1/dim(trans)[1]
         reglas <- apriori(data = trans,
                           parameter = list(support = soporte,
                                            confidence = 0.01,
@@ -309,7 +308,7 @@ metricas <- interestMeasure(x = reglas, measure = c("coverage", "fishersExactTes
         promo3x2 <- filter(.data = df_fishers, confidence == 1)
         promo3x2$confidence <- round(promo3x2$confidence, 4)
         
-        promo3x2 <- select(promo3x2, !fisherExactRest)
+        promo3x2 <- select(promo3x2, !fisherExactRest)[1:50,]
         
         datatable(data = promo3x2, rownames = F, options = list(pageLength = 5))%>%
             formatPercentage(columns = "confidence", digits = 1)
@@ -412,10 +411,10 @@ Para realizar el Market Basket Análisis se utilizó una base de datos de `r no_
 ### Market Basket
 
 ```{r, echo=F, include=F}
-soporte <-50/dim(trans)[1]
+soporte <-30/dim(trans)[1]
         reglas <- apriori(data = trans,
                           parameter = list(support = soporte,
-                                           confidence = 0.01,
+                                           confidence = 0.1,
                                            minlen = 2,
                                            maxlen = 4,
                                            target = "rules"),
@@ -460,7 +459,7 @@ Las gráficas son una excelente manera de visualizar cómo los artículos que se
 support <- 10/dim(trans)[1]
         
         rules <- apriori(data = trans,
-                         parameter = list(supp=support, conf=0.01, minlen =2),
+                         parameter = list(supp=support, conf=0.1, minlen =2),
                          control = list(verbose = FALSE))
         
         rules <- rules[is.maximal(rules)]
@@ -484,7 +483,7 @@ soporte <- 1/dim(trans)[1]
                                              confidence = 0.01,
                                              minlen = 2,
                                              maxlen = 2),
-                            appearance = list(default = "rhs",lhs="TENIS"),
+                            appearance = list(default = "lhs",rhs="TENIS"),
                             control = list(verbose=F))
       
         itemsets <- sort(itemsets, decreasing = T)
@@ -507,7 +506,7 @@ soporte <- 1/dim(trans)[1]
                                              confidence = 0.01,
                                              minlen = 2,
                                              maxlen = 2),
-                            appearance = list(default = "rhs",lhs="BALERINAS"),
+                            appearance = list(default = "lhs",rhs="BALERINAS"),
                             control = list(verbose=F))
       
         itemsets <- sort(itemsets, decreasing = T)
@@ -536,7 +535,7 @@ soporte <-1/dim(trans)[1]
                                            confidence = 0.01,
                                            minlen = 2,
                                            maxlen = 2),
-                          appearance = list(default="lhs",rhs = accesorios),
+                          appearance = list(default="rhs",lhs = accesorios),
                           control = list(verbose=F))
         reglas <- reglas[is.maximal(reglas)]
         promo2x1 <- sort(reglas, by = "count", decreasing = T)
@@ -555,7 +554,7 @@ soporte <-1/dim(trans)[1]
 
 ## Sport Tienda {.tabset}
 
-La tienda departamental Action Sports busca renovar sus diferentes sucursales físicas y online, de acuerdo al comportamiento de compra de sus clientes. De esta manera, el cliente encontrará los artículos que más compra cerca uno del otro, además de ofrecer artículos de interes alrededor. 
+La tienda departamental Action Sports busca renovar sus diferentes sucursales físicas, de acuerdo al comportamiento de compra de sus clientes. De esta manera, el cliente encontrará los artículos que más compra cerca uno del otro, además de ofrecer artículos de interes alrededor. 
 
 Además, busca una manera eficiente de disminuir sus inventarios cuando se acaba una temporada de Primavera-Verano o Otoño-Invierno creando promociones tanto para tiendas físicas como online.
 
@@ -645,10 +644,10 @@ Para realizar el Market Basket Análisis se utilizó una base de datos de `r no_
 ### Market Basket
 
 ```{r, echo=F, include=F}
-soporte <-300/dim(trans)[1]
+soporte <-100/dim(trans)[1]
         reglas <- apriori(data = trans,
                           parameter = list(support = soporte,
-                                           confidence = 0.01,
+                                           confidence = 0.1,
                                            minlen = 2,
                                            maxlen = 4,
                                            target = "rules"),
@@ -690,10 +689,10 @@ top.count <- sort(reglas, by = "count", decreasing = T)
 Las gráficas son una excelente manera de visualizar cómo los artículos que se relacionan entre sí. Las reglas están representadas dentro los círculos y estos, a su vez, están conectados con sus artículos mediante flechas.
 
 ```{r, echo=F, include=T, fig.width=7, warning=F, , out.width="100%"}
-support <- 100/dim(trans)[1]
+support <- 50/dim(trans)[1]
         
         rules <- apriori(data = trans,
-                         parameter = list(supp=support, conf=0.0001, minlen =2),
+                         parameter = list(supp=support, conf=0.1, minlen =2),
                          control = list(verbose = FALSE))
         
         rules <- rules[is.maximal(rules)]
@@ -705,19 +704,22 @@ support <- 100/dim(trans)[1]
 
 ### Solución 1
 
-```{r, echo=F, include=F}
-soporte <- 100/dim(trans)[1]
-        itemsets <- apriori(data = trans,
-                            parameter = list(support = soporte,
-                                             minlen = 3,
-                                             target = "frequent itemset"))
-        
-        itemsets <- itemsets[is.maximal(itemsets)]
-        itemsets <- sort(itemsets, decreasing = T)
+Para conocer el layout mas eficiente para la tienda física utilizaremos el gráfico de reglas, de esta manera podemos visualizar las secciones que tienen relación entre si.
 
+```{r, echo=F, include=T, fig.width=7, warning=F, , out.width="100%"}
+support <- 10/dim(trans)[1]
+        
+        rules <- apriori(data = trans,
+                         parameter = list(supp=support, conf=0.15, minlen =2),
+                         control = list(verbose = FALSE))
+        
+        rules <- rules[is.maximal(rules)]
+        
+        rules <- sort(rules, by = "count", decreasing = T)
+        
+        plot(rules, method="graph", engine = "htmlwidget")
 ```
 
-*Pendiente todavía de procesar los datos.*
 
 ### Solución 2
 
