@@ -41,23 +41,24 @@ library(plotly)
 
 El Market Basket Analysis, es utilizado en la industria del retail e e-commerce para entender el comportamiento de compra de los clientes. Esta metodología detecta las combinaciones de artículos que suelen comprar al mismo tipo. 
 
-Pogen Analytics pone a tu disposición 3 demos para que conozcas nuestra plataforma de Market Basket Análysis y los beneficios que puede traer a tu negocio:
+**Pogen Analytics** pone a tu disposición 3 casos para que conozcas nuestra plataforma de Market Basket Análysis y los beneficios que puede traer a tu negocio:
 
-* Demo 1: Supermercado
-* Demo 2: Zapatería
-* Demo 3: Tienda Departamental
+* Caso 1: Supermercado
+* Caso 2: Zapatería
+* Caso 3: Tienda Departamental
 
-A través de los diferentes demos podrás analisar su Market Basket Análysis y las recomendaciones que Pogen Analytics suguiere para resolver cada uno de sus casos.
+A través de los diferentes casos podrás analisar su Market Basket Análysis y las recomendaciones que Pogen Analytics suguiere para resolver cada uno de ellos.
 
-# Demo 1
+
+# Caso 1
 
 ## Supermercado Intermarche {.tabset}
 
 La compra de productos de supermercado online alrededor del mundo ya es una tendencia, en México es el que tiene mayor frecuencia de compra semanal con el 23% entre todas las categorías de compra en línea. 
 
-Debido a la importancia que va cobrando la compra del supermercado vía online, Supermercado Intermarche busca ofrecer a sus clientes una mejor experiencia de compra agregando a su portal una sección donde sus clientes puedan comprar paquetes de productos recomendados.
+Debido a la importancia que va cobrando la compra del supermercado vía online, Supermercado Intermarche busca ofrecer a sus clientes una mejor experiencia de compra agregando a su portal una sección donde sus clientes puedan comprar **paquetes de productos** recomendados.
 
-Además busca una solución para generar sus ofertas de 2x1 y 3x2 de acuerdo al comportamiento de sus clientes, asegurando asi su éxito. 
+Además busca una solución para generar sus **ofertas** de 2x1 y 3x2 de acuerdo al comportamiento de sus clientes, asegurando asi su éxito. 
 
 ```{r , include=FALSE}
 
@@ -94,9 +95,11 @@ names(data) <- c("ticket","items")
         no_ticket <- resume@Dim[2]
 ```
 
-Para realizar el Market Basket Análisis se utilizó una base de datos de `r no_trans` transacciones y `r no_ticket` artículos, el cual representa una semana de ventas del supermercado.
+Para realizar el Market Basket Análisis se utilizó una base de datos de **`r no_trans` transacciones** y **`r no_ticket` artículos**, el cual representa una **semana de ventas** del supermercado.
 
 **Productos más vendidos**
+
+La siguiente gráfica muestra la cantidad y porcentaje (del total de artículos vendidos) de los 10 artículos más vendidos.
 
 ```{r, echo=F, include=T, fig.width=7, out.width="100%"}
         freq <- data.frame(table(data$items)) 
@@ -115,10 +118,12 @@ Para realizar el Market Basket Análisis se utilizó una base de datos de `r no_
                 marker = list(color = "#235a79")) %>%
             layout(title = list(tittle = ""),
                    xaxis = list(title = "", tickangle = -45),
-                   yaxis = list(title = ""))
+                   yaxis = list(title = "Número de artículos vendidos"))
 ```
 
 **Tamaños de tickets de compra**
+
+Los tamaños de tickets de compra nos indica la medida en que los artículos son llevados a la vez, es decir, de acuerdo a la gráfica siguiente, el 36.18% de los tickets contenían 4 artículos, a difererencia del 23.22% de los tickets que solo llevaba un artículo.
 
 ```{r, echo=F, include=T, fig.width=7, out.width="100%"}
         freq <- data.frame(table(data$ticket)) 
@@ -138,8 +143,8 @@ Para realizar el Market Basket Análisis se utilizó una base de datos de `r no_
                 cliponaxis = FALSE,
                 marker = list(color = "#f04438")) %>%
             layout(title = "",
-                   xaxis = list(title = "", tickangle = -45),
-                   yaxis = list(title = ""))
+                   xaxis = list(title = "Número de artículos por ticket", tickangle = -45),
+                   yaxis = list(title = "Número de tickets"))
 ```
         
 ### Market Basket
@@ -160,7 +165,10 @@ soporte <- 100/dim(trans)[1]
 
 Una regla de asociación se define como una implicación del tipo “si X entonces Y” (X⇒Y). Por ejemplo, la regla {Leche} => {Cereal}  significa que, cuando compran CALZADO, también compran CORRER. El lado izquierdo de la regla recibe el nombre de antecedente (LHS) y el lado derecho el nombre de consecuente (RHS).
 
-El porcentaje de confiabilidad es la probabilidad de que una transacción que contiene los items  X, también contengan los items de Y. Por ejemplo, el 20% de las veces que se compra leche también se compra cereal.
+El porcentaje de confiabilidad es la probabilidad de que una transacción que contiene los items  X, también contengan los items de Y. Por ejemplo, el 20% de las veces que se compra leche también se compra cereal, o bien, como en el caso aquí estudiado del Supermercado Intermarche: la regla {Yogurt} ⇒ {whole milk}, significa que el 27% de las veces que se llevó 'yogurt' también se llevó 'whole milk'.
+
+A continuación presentamos la tabla con las reglas de asociación más importantes del análisis.
+
 
 ```{r, echo=F, include=T, out.width="100%"}
 top.count <- sort(reglas, by = "lift", decreasing = T)
@@ -183,11 +191,14 @@ top.count <- sort(reglas, by = "lift", decreasing = T)
             formatPercentage(columns = "% Conf", digits = 1)
 ```
 
-**Grafo de Reglas**
+**Comunidades de artículos**
 
 Las gráficas son una excelente manera de visualizar cómo los artículos que se relacionan entre sí. Las reglas están representadas dentro los círculos y estos, a su vez, están conectados con sus artículos mediante flechas.
 
-```{r, echo=F, include=T, fig.width=7, warning=F, , out.width="100%"}
+Como podrás apreciar, el producto 'whole milk' resulta ser un artículo al centro de algo que parece tomar forma de estrella, lo cual refleja su gran relación con muchos productos del supermercado.
+
+
+```{r, echo=F, include=T, fig.width=7, fig.height=5, warning=F, , out.width="100%"}
 support <- 50/dim(trans)[1]
         
         rules <- apriori(data = trans,
@@ -205,7 +216,7 @@ support <- 50/dim(trans)[1]
 
 **Conjunto de productos**
 
-Supermercado Intermarché puede recomendar a sus clientes agregar a su carrito de compra un conjunto de artículos con un solo click, de esta manera se simplifica el proceso de estar agregando artículos por artículo.
+Supermercado Intermarché puede recomendar a sus clientes agregar a su carrito de compra un conjunto de artículos con un solo click, de esta manera se simplifica el proceso de estar agregando artículo por artículo. A continuación se presenta una tabla con los posibles conjuntos de artículos que podrían ser ofrecidos al comprador una vez que el mismo haya seleccionado alguno o algunos del mismo conjunto, de esa forma el supermercado predice los artículos de interés del comprador, y el comprador observa en la plataforma la manera de seleccionar todos los artículos en un solo click.
 
 ```{r, echo=F, include=F}
 soporte <- 32/dim(trans)[1]
@@ -313,17 +324,15 @@ metricas <- interestMeasure(x = reglas, measure = c("coverage", "fishersExactTes
         datatable(data = promo3x2, rownames = F, options = list(pageLength = 5))%>%
             formatPercentage(columns = "confidence", digits = 1)
 ```
-
 ## {-}
 
-
-# Demo 2
+# Caso 2
 
 ## Zapateria Ivonne {.tabset}
 
-La zapateria Ivonne cuenta con 20 sucursales a nivel nacional, y busca ofrecer a sus vendedores de piso una plataforma donde puedan visualizar la relación que hay entre productos, de esta manera ellos puedan conocer qué artículos ofrecer de acuerdo al modelo que su cliente está a punto de comprar y asi aumentar sus tamaños de ticket de venta.
+La zapateria Ivonne cuenta con 20 sucursales a nivel nacional, y busca ofrecer a sus vendedores de piso una plataforma donde puedan visualizar la relación que hay entre productos, de esta manera ellos puedan conocer qué artículos ofrecer de acuerdo al modelo que su cliente está a punto de comprar y asi aumentar sus **tamaños de ticket de venta**.
 
-Además busca una solución para generar promociones entre accesorios y zapatos de acuerdo al comportamiento de sus clientes. 
+Además busca una solución para generar **promociones** entre accesorios y zapatos de acuerdo al comportamiento de sus clientes. 
 
 ```{r , include=FALSE}
 
@@ -360,9 +369,11 @@ names(data) <- c("ticket","items")
         no_ticket <- resume@Dim[2]
 ```
 
-Para realizar el Market Basket Análisis se utilizó una base de datos de `r no_trans` transacciones y `r no_ticket` artículos, que corresponden a las ventas del 2019 en una de las sucursales. En las siguientes gráficas se muestran los productos más vendidos y el tamaño de ticket más frecuente.
+Para realizar el Market Basket Análisis se utilizó una base de datos de **`r no_trans` transacciones** y **`r no_ticket` artículos**, que corresponden a las **ventas del 2019** en una de las sucursales. En las siguientes gráficas se muestran los productos más vendidos y el tamaño de ticket más frecuente.
 
 **Productos más vendidos**
+
+La siguiente gráfica muestra la cantidad y porcentaje (del total de artículos vendidos) de los 10 artículos más vendidos.
 
 ```{r, echo=F, include=T, fig.width=7, out.width="100%"}
         freq <- data.frame(table(data$items)) 
@@ -381,10 +392,12 @@ Para realizar el Market Basket Análisis se utilizó una base de datos de `r no_
                 marker = list(color = "#235a79")) %>%
             layout(title = list(tittle = ""),
                    xaxis = list(title = "", tickangle = -45),
-                   yaxis = list(title = ""))
+                   yaxis = list(title = "Número de artículos vendidos"))
 ```
 
 **Tamaños de tickets de compra**
+
+Los tamaños de tickets de compra nos indica la medida en que los artículos son llevados a la vez, es decir, de acuerdo a la gráfica siguiente, el 67.55% de los tickets contenían solo 1 artículo, a difererencia del 22.46% de los tickets que llevaban 2 artículos.
 
 ```{r, echo=F, include=T, fig.width=7, out.width="100%"}
         freq <- data.frame(table(data$ticket)) 
@@ -404,8 +417,8 @@ Para realizar el Market Basket Análisis se utilizó una base de datos de `r no_
                 cliponaxis = FALSE,
                 marker = list(color = "#f04438")) %>%
             layout(title = "",
-                   xaxis = list(title = "", tickangle = -45),
-                   yaxis = list(title = ""))
+                   xaxis = list(title = "Número de artículos por ticket", tickangle = -45),
+                   yaxis = list(title = "Número de tickets"))
 ```
         
 ### Market Basket
@@ -427,7 +440,10 @@ soporte <-30/dim(trans)[1]
 
 Una regla de asociación se define como una implicación del tipo “si X entonces Y” (X⇒Y). Por ejemplo, la regla {Tenis} => {Agujetas}  significa que, cuando compran Tenis, también compran Agujetas. El lado izquierdo de la regla recibe el nombre de antecedente (LHS) y el lado derecho el nombre de consecuente (RHS).
 
-El porcentaje de confiabilidad es la probabilidad de que una transacción que contiene los items  X, también contengan los items de Y. Por ejemplo, el 20% de las veces que se compra Tenis también se compra Agujetas.
+El porcentaje de confiabilidad es la probabilidad de que una transacción que contiene los items  X, también contengan los items de Y. Por ejemplo, el 20% de las veces que se compra Tenis también se compra Agujetas, o bien, como en el caso aquí estudiado de la zapatería Ivonne: la regla {TENIS} ⇒ {SNEAKERS}, significa que el 25.4% de las veces que se llevó ‘TENIS’ también se llevó ‘SNEAKERS’.
+
+A continuación presentamos la tabla con las reglas de asociación más importantes del análisis.
+
 
 ```{r, echo=F, include=T, out.width="100%"}
 top.count <- sort(reglas, by = "count", decreasing = T)
@@ -451,11 +467,13 @@ top.count <- sort(reglas, by = "count", decreasing = T)
             formatPercentage(columns = "% Conf", digits = 1)
 ```
 
-**Grafo de Reglas**
+**Comunidades de artículos**
 
 Las gráficas son una excelente manera de visualizar cómo los artículos que se relacionan entre sí. Las reglas están representadas dentro los círculos y estos, a su vez, están conectados con sus artículos mediante flechas.
 
-```{r, echo=F, include=T, fig.width=7, warning=F, , out.width="100%"}
+Como podrás apreciar en el gráfico siguiente, los productos 'TENIS', 'LLAVERO', 'BALERINAS' Y 'SNEAKERS' son el centro de múltiples relaciones con gran cantidad de productos.
+
+```{r, echo=F, include=T, fig.width=7, fig.height=5, warning=F, , out.width="100%"}
 support <- 10/dim(trans)[1]
         
         rules <- apriori(data = trans,
@@ -473,9 +491,12 @@ support <- 10/dim(trans)[1]
 
 **Plataforma de venta**
 
-Los vendedores de piso son los empleados que más deben estar informados del comportamiento de sus clientes y de esta manera impulsar sus ventas. El/Ella puede ir a su plataforma y teclear el tipo de zapato que su cliente se está llevando y saber que otro producto ofrecerle.
+Los vendedores de piso son los empleados que más deben estar informados del comportamiento de sus clientes y de esta manera impulsar sus ventas. Por lo tanto, el vendedor puede ir a su plataforma y teclear el tipo de zapato que su cliente se está llevando y saber que otro producto ofrecerle y que tenga la mayor probabilidad de ser comprado también.
 
-La clienta de Carolina se está probando Tenis por lo tanto le debe ofrecer:
+A continuación dos tablas con dos ejemplos:
+
+1. La clienta A se está probando 'TENIS', por lo tanto se le debe ofrecer: 'SNEAKERS', 'BALERINAS' y 'TACONES'.
+
 ```{r, echo=F, include=T, out.width="100%"}
 soporte <- 1/dim(trans)[1]
         itemsets <- apriori(data = trans,
@@ -498,7 +519,8 @@ soporte <- 1/dim(trans)[1]
           formatPercentage(columns = "confidence", digits = 1)
 ```
 
-La clienta de Eduardo se está probando unas balerinas, por lo tanto debe de ofrecer:
+2. La clienta B se está probando 'BALERINAS', por lo tanto se le debe ofrecer: 'TENIS', 'TACONES' y 'MOCASINES'.
+
 ```{r, echo=F, include=T, out.width="100%"}
 soporte <- 1/dim(trans)[1]
         itemsets <- apriori(data = trans,
@@ -525,7 +547,7 @@ soporte <- 1/dim(trans)[1]
 
 **Promociones Zapatos-Accesorios**
 
-La zapateria Ivonne ha tenido gran exito en su venta de accesorios y busca generar una promoción donde sus clientes compren Zapatos y obtengan un accesorio en descuento o gratis. Las mejores 10 combinaciones de productos que el analisis arrojó fueron las siguientes.
+La zapateria Ivonne ha tenido gran éxito en su venta de accesorios y busca generar una promoción donde sus clientes compren Zapatos y obtengan un accesorio en descuento o gratis. Las mejores 10 combinaciones de productos que el análisis arrojó fueron las siguientes.
 
 ```{r, echo=F, include=T, out.width="100%"}
 accesorios <- c("AGUJETAS","BOLSA","COSMETIQUERA","LENTES","LLAVERO","MOCHILA","MONEDERO","PERFUME","PLANTILLAS")
@@ -548,15 +570,17 @@ soporte <-1/dim(trans)[1]
             formatPercentage(columns = "confidence", digits = 1)
 ```
 
+
+
 ## {-}
 
-# Demo 3
+# Caso 3
 
 ## Sport Tienda {.tabset}
 
-La tienda departamental Action Sports busca renovar sus diferentes sucursales físicas, de acuerdo al comportamiento de compra de sus clientes. De esta manera, el cliente encontrará los artículos que más compra cerca uno del otro, además de ofrecer artículos de interes alrededor. 
+La tienda departamental Action Sports busca **renovar** sus diferentes sucursales físicas, de acuerdo al comportamiento de compra de sus clientes. De esta manera, el cliente encontrará los artículos que más compra cerca uno del otro, además de ofrecer artículos de interés alrededor. 
 
-Además, busca una manera eficiente de disminuir sus inventarios cuando se acaba una temporada de Primavera-Verano o Otoño-Invierno creando promociones tanto para tiendas físicas como online.
+Además, busca una manera eficiente de disminuir sus **inventarios** cuando se acaba una temporada de Primavera-Verano o Otoño-Invierno creando promociones tanto para tiendas físicas como online.
 
 ```{r , include=FALSE}
 
@@ -593,9 +617,11 @@ names(data) <- c("ticket","items")
         no_ticket <- resume@Dim[2]
 ```
 
-Para realizar el Market Basket Análisis se utilizó una base de datos de `r no_trans` transacciones y `r no_ticket` artículos. En las siguientes gráficas se muestran los productos más vendidos y el tamaño de ticket más frecuente.
+Para realizar el Market Basket Análisis se utilizó una base de datos de **`r no_trans` transacciones** y **`r no_ticket` artículos**. En las siguientes gráficas se muestran los productos más vendidos y el tamaño de ticket más frecuente.
 
 **Productos más vendidos**
+
+La siguiente gráfica muestra la cantidad y porcentaje (del total de artículos vendidos) de los 10 artículos más vendidos.
 
 ```{r, echo=F, include=T, fig.width=7, out.width="100%"}
         freq <- data.frame(table(data$items)) 
@@ -614,10 +640,12 @@ Para realizar el Market Basket Análisis se utilizó una base de datos de `r no_
                 marker = list(color = "#235a79")) %>%
             layout(title = list(tittle = ""),
                    xaxis = list(title = "", tickangle = -45),
-                   yaxis = list(title = ""))
+                   yaxis = list(title = "Número de artículos vendidos"))
 ```
 
 **Tamaños de tickets de compra**
+
+Los tamaños de tickets de compra nos indica la medida en que los artículos son llevados a la vez, es decir, de acuerdo a la gráfica siguiente, el 67.3% de los tickets contenían 1 artículo, a difererencia del 21.78% de los tickets que llevaban 2 artículos.
 
 ```{r, echo=F, include=T, fig.width=7, out.width="100%"}
         freq <- data.frame(table(data$ticket)) 
@@ -637,8 +665,8 @@ Para realizar el Market Basket Análisis se utilizó una base de datos de `r no_
                 cliponaxis = FALSE,
                 marker = list(color = "#f04438")) %>%
             layout(title = "",
-                   xaxis = list(title = "", tickangle = -45),
-                   yaxis = list(title = ""))
+                   xaxis = list(title = "Número de tickets", tickangle = -45),
+                   yaxis = list(title = "Número de artículos por ticket"))
 ```
         
 ### Market Basket
@@ -658,9 +686,11 @@ soporte <-100/dim(trans)[1]
 
 **Reglas de asociación**
 
-Una regla de asociación se define como una implicación del tipo “si X entonces Y” (X⇒Y). Por ejemplo, la regla {Futbol} => {Calzado}  significa que, cuando compran Leche, también compran Cereal. El lado izquierdo de la regla recibe el nombre de antecedente (LHS) y el lado derecho el nombre de consecuente (RHS).
+Una regla de asociación se define como una implicación del tipo “si X entonces Y” (X⇒Y). Por ejemplo, la regla {Futbol} => {Calzado}  significa que, cuando compran Futbol, también compran Calzado. El lado izquierdo de la regla recibe el nombre de antecedente (LHS) y el lado derecho el nombre de consecuente (RHS).
 
-El porcentaje de confiabilidad es la probabilidad de que una transacción que contiene los items  X, también contengan los items de Y. Por ejemplo, el 20% de las veces que se compra Futbol también se compra Calzado.
+El porcentaje de confiabilidad es la probabilidad de que una transacción que contiene los items  X, también contengan los items de Y. Por ejemplo, el 20% de las veces que se compra Futbol también se compra Calzado, o bien, como en el caso aquí estudiado de la Sport Tienda: la regla {INFANTIL} ⇒ {VESTIMENTA}, significa que el 10.8% de las veces que se llevaron productos de la sección ‘INFANTIL’ también se llevaron de la sección ‘VESTIMENTA'.
+
+A continuación presentamos la tabla con las reglas de asociación más importantes del análisis.
 
 ```{r, echo=F, include=T, out.width="100%"}
 top.count <- sort(reglas, by = "count", decreasing = T)
@@ -684,15 +714,17 @@ top.count <- sort(reglas, by = "count", decreasing = T)
             formatPercentage(columns = "% Conf", digits = 1)
 ```
 
-**Grafo de Reglas**
+**Comunidades de artículos**
 
-Las gráficas son una excelente manera de visualizar cómo los artículos que se relacionan entre sí. Las reglas están representadas dentro los círculos y estos, a su vez, están conectados con sus artículos mediante flechas.
+Las gráficas son una excelente manera de visualizar cómo los artículos se relacionan entre sí. Las reglas están representadas dentro los círculos y estos, a su vez, están conectados con sus artículos mediante flechas.
 
-```{r, echo=F, include=T, fig.width=7, warning=F, , out.width="100%"}
+Como se puede apreciar en la siguiente gráfica, las secciones 'VESTIMENTA', 'GIMNACIO' y 'CORRER', son el centro de múltiples relaciones con el resto de las secciones de la tienda.
+
+```{r, echo=F, include=T, fig.width=7, fig.height=5,warning=F, , out.width="100%"}
 support <- 50/dim(trans)[1]
         
         rules <- apriori(data = trans,
-                         parameter = list(supp=support, conf=0.1, minlen =2),
+                         parameter = list(supp=support, conf=0.15, minlen =2),
                          control = list(verbose = FALSE))
         
         rules <- rules[is.maximal(rules)]
@@ -704,9 +736,11 @@ support <- 50/dim(trans)[1]
 
 ### Solución 1
 
-Para conocer el layout mas eficiente para la tienda física utilizaremos el gráfico de reglas, de esta manera podemos visualizar las secciones que tienen relación entre si.
+Para conocer el layout mas eficiente para la tienda física utilizaremos el gráfico de reglas, de esta manera podemos visualizar las secciones que tienen relación entre si. 
 
-```{r, echo=F, include=T, fig.width=7, warning=F, , out.width="100%"}
+Las secciones 'VESTIMENTA', 'GIMNACIO' y 'CORRER', son las secciones más populares al tener mayor número de reglas de asociación con el resto de las secciones. Por lo tanto, como podemos observar en la gráfica, las secciones 'FUTBOL', 'DEPORTE ACUATICO', y 'ACCESORIOS' tienen muy pocas asociaciones con todas las secciones de la tienda, además de solo presentar asociaciones con las secciones 'GIMNACIO' y 'CORRER', por lo que una estrategia sería no aislarlas tanto de las secciones más populares, y de esta menera incentivar la compra dentro de esas secciones menos populares a partir de la visita a las populares.
+
+```{r, echo=F, include=T, fig.width=7, fig.height=7, warning=F, , out.width="100%"}
 support <- 10/dim(trans)[1]
         
         rules <- apriori(data = trans,
@@ -792,5 +826,15 @@ soporte <-1/dim(trans)[1]
 ```
 
 ## {-}
+
+# **Contacto**
+
+Si tienes dudas, o quieres analizar los datos de tu propio negocio, ponte en contacto con nosotros.
+
+*Pavel Medina-Ruiz*
+
+*Líder de Analítica de datos*
+
+*pavel.medina@pogen.com*
 
 
