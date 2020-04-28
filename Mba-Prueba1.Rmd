@@ -56,9 +56,13 @@ Sirve para entender el comportamiento de los consumidores, conocer cuáles son l
 
 La venta de productos online en supermercados ya es una realidad y una tendencia no solo en todo el mundo sino también en México, país que tiene la más alta frecuencia de compra semanal en línea en todas sus categorías (23%).
 
+<!-- Fuente: https://marketing4ecommerce.mx/para-2020-la-compra-de-productos-de-supermercado-online-sera-del-20-en-mexico/  -->
+
 Debido a la importancia y el auge de la venta online, Supermercado Intermarché busca ofrecer a sus clientes una mejor experiencia de compra agregando a su portal una sección en la que sus clientes puedan comprar **paquetes de productos** recomendados.
 
 Además busca una solución para generar sus **ofertas** de 2x1 y 3x2 de acuerdo al comportamiento de sus clientes, asegurando así su éxito. 
+
+<!-- Base de datos: https://www.kaggle.com/irfanasrullah/groceries#groceries.csv -->
 
 ```{r , include=FALSE}
 
