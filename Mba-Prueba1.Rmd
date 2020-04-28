@@ -95,6 +95,7 @@ names(data) <- c("ticket","items")
         
         resume <- summary(trans)
         no_trans <- resume@Dim[1]
+        no_trans <- format(no_trans, nsmall = 0, big.mark = ",")
         no_ticket <- resume@Dim[2]
 ```
 
@@ -102,7 +103,7 @@ Para realizar el Market Basket Analysis se utilizó una base de datos de **`r no
 
 **Productos más vendidos**
 
-La siguiente gráfica muestra la cantidad y porcentaje (del total de artículos vendidos) de los 10 artículos más vendidos.
+La siguiente gráfica muestra la cantidad y el porcentaje (del total de artículos vendidos) de los 10 artículos más vendidos.
 
 ```{r, echo=F, include=T, fig.width=7, out.width="100%"}
         freq <- data.frame(table(data$items)) 
@@ -126,7 +127,7 @@ La siguiente gráfica muestra la cantidad y porcentaje (del total de artículos 
 
 **Tamaños de tickets de compra**
 
-Los tamaños de tickets de compra nos indica la medida en que los artículos son llevados a la vez, es decir, de acuerdo a la gráfica siguiente, el 36.18% de los tickets contenían 4 artículos, a difererencia del 23.22% de los tickets que solo llevaba un artículo.
+Los tamaños de tickets de compra nos indican la medida en que los artículos son llevados a la vez. Es decir, de acuerdo a la gráfica siguiente, el 36.18% de los tickets contenía 4 artículos, a diferencia del 23.22% de los tickets que solo llevaba un artículo.
 
 ```{r, echo=F, include=T, fig.width=7, out.width="100%"}
         freq <- data.frame(table(data$ticket)) 
@@ -166,7 +167,7 @@ soporte <- 100/dim(trans)[1]
 
 **Reglas de asociación**
 
-Una regla de asociación se define como una implicación del tipo “si X entonces Y” (X⇒Y). Por ejemplo, la regla {Leche} => {Cereal}  significa que cuando compran Leche, también compran Cereal. El lado izquierdo de la regla recibe el nombre de antecedente (LHS), y el lado derecho, el nombre de consecuente (RHS).
+Una regla de asociación se define como una implicación del tipo “si X entonces Y” (X⇒Y). Por ejemplo, la regla {Leche} => {Cereal}  significa que cuando compran Leche también compran Cereal. El lado izquierdo de la regla recibe el nombre de antecedente (LHS), y el lado derecho, el nombre de consecuente (RHS).
 
 El porcentaje de confiabilidad es la probabilidad de que una transacción que contiene los items  X, también contengan los items de Y. Por ejemplo, la regla {Yogurt} ⇒ {whole milk}, significa que el 27% de las veces que se llevó 'yogurt' también se llevó 'whole milk'.
 
@@ -245,7 +246,7 @@ itemsets <- select(.data = itemsets, !support)
 
 ### Solución 2
 
-El supermercado Intermarche tiene la oportunidad de ofrecer productos gratis en la compra de otros productos. Para poder determinar cuáles promociones tendrán mayor éxito se utilizan las reglas de asociación más confiables y frecuentes.
+El supermercado Intermarché tiene la oportunidad de ofrecer productos gratis en la compra de otros productos. Para poder determinar cuáles promociones tendrán mayor éxito se utilizan las reglas de asociación más confiables y frecuentes.
 
 **Promociones 2x1**
 
@@ -331,7 +332,7 @@ metricas <- interestMeasure(x = reglas, measure = c("coverage", "fishersExactTes
 
 # Caso 2
 
-## Zapateria Ivonne {.tabset}
+## Zapatería Ivonne {.tabset}
 
 La zapatería Ivonne cuenta con 20 sucursales a nivel nacional. Busca ofrecer a sus vendedores de piso una plataforma  en la que visualicen la relación que hay entre productos para que puedan conocer qué artículos ofrecerles a sus clientes de acuerdo al modelo que estén a punto de comprar y así aumentar sus **tamaños de ticket de venta**.
 
@@ -369,6 +370,7 @@ names(data) <- c("ticket","items")
         
         resume <- summary(trans)
         no_trans <- resume@Dim[1]
+        no_trans <- format(no_trans, nsmall = 0, big.mark = ",")
         no_ticket <- resume@Dim[2]
 ```
 
@@ -376,7 +378,7 @@ Para realizar el Market Basket Análisis se utilizó una base de datos de **`r n
 
 **Productos más vendidos**
 
-La siguiente gráfica muestra la cantidad y porcentaje (del total de artículos vendidos) de los 10 artículos más vendidos.
+La siguiente gráfica muestra la cantidad y el porcentaje (del total de artículos vendidos) de los 10 artículos más vendidos.
 
 ```{r, echo=F, include=T, fig.width=7, out.width="100%"}
         freq <- data.frame(table(data$items)) 
@@ -400,7 +402,7 @@ La siguiente gráfica muestra la cantidad y porcentaje (del total de artículos 
 
 **Tamaños de tickets de compra**
 
-Los tamaños de tickets de compra nos indica la medida en que los artículos son llevados a la vez, es decir, de acuerdo a la gráfica siguiente, el 67.55% de los tickets contenían solo 1 artículo, a difererencia del 22.46% de los tickets que llevaban 2 artículos.
+Los tamaños de tickets de compra nos indican la medida en que los artículos son llevados a la vez. Es decir, de acuerdo a la gráfica siguiente, el 67.55% de los tickets contenía solo 1 artículo, a diferencia del 22.46% de los tickets que llevaba 2 artículos.
 
 ```{r, echo=F, include=T, fig.width=7, out.width="100%"}
         freq <- data.frame(table(data$ticket)) 
@@ -546,7 +548,7 @@ soporte <- 1/dim(trans)[1]
           formatPercentage(columns = "confidence", digits = 1)
 ```
 
-### Solucion 2
+### Solución 2
 
 **Promociones Zapatos-Accesorios**
 
@@ -583,7 +585,7 @@ soporte <-1/dim(trans)[1]
 
 La tienda departamental Action Sports busca **renovar** sus diferentes sucursales físicas, de acuerdo al comportamiento de compra de sus clientes.  Quiere que los clientes encuentren los artículos que más compran cerca unos de los otros y ofrecerle artículos de interés a su alrededor.
 
-Además, busca una manera eficiente de disminuir sus **inventarios** cuando se acaba una temporada de Primavera-Verano u Otoño-Invierno creando promociones tanto para tiendas físicas para online.
+Además, busca una manera eficiente de disminuir sus **inventarios** cuando se acaba una temporada de Primavera-Verano u Otoño-Invierno creando promociones tanto para tiendas físicas como para online.
 
 ```{r , include=FALSE}
 
@@ -617,6 +619,7 @@ names(data) <- c("ticket","items")
         
         resume <- summary(trans)
         no_trans <- resume@Dim[1]
+        no_trans <- format(no_trans, nsmall = 0, big.mark = ",")
         no_ticket <- resume@Dim[2]
 ```
 
@@ -624,7 +627,7 @@ Para realizar el Market Basket Análisis se utilizó una base de datos de **`r n
 
 **Productos más vendidos**
 
-La siguiente gráfica muestra la cantidad y porcentaje (del total de artículos vendidos) de los 10 artículos más vendidos.
+La siguiente gráfica muestra la cantidad y el porcentaje (del total de artículos vendidos) de los 10 artículos más vendidos.
 
 ```{r, echo=F, include=T, fig.width=7, out.width="100%"}
         freq <- data.frame(table(data$items)) 
@@ -648,7 +651,7 @@ La siguiente gráfica muestra la cantidad y porcentaje (del total de artículos 
 
 **Tamaños de tickets de compra**
 
-Los tamaños de tickets de compra nos indica la medida en que los artículos son llevados a la vez, es decir, de acuerdo a la gráfica siguiente, el 67.3% de los tickets contenían 1 artículo, a difererencia del 21.78% de los tickets que llevaban 2 artículos.
+Los tamaños de tickets de compra nos indican la medida en que los artículos son llevados a la vez. Es decir, de acuerdo a la gráfica siguiente, el 67.3% de los tickets contenía 1 artículo, a diferencia del 21.78% de los tickets que llevaba 2 artículos.
 
 ```{r, echo=F, include=T, fig.width=7, out.width="100%"}
         freq <- data.frame(table(data$ticket)) 
@@ -689,7 +692,7 @@ soporte <-100/dim(trans)[1]
 
 **Reglas de asociación**
 
-Una regla de asociación se define como una implicación del tipo “si X entonces Y” (X⇒Y). Por ejemplo, la regla {Futbol} => {Calzado} significa que, cuando compran Leche, también compran Cereal. El lado izquierdo de la regla recibe el nombre de antecedente (LHS), y el lado derecho, el nombre de consecuente (RHS).
+Una regla de asociación se define como una implicación del tipo “si X entonces Y” (X⇒Y). Por ejemplo, la regla {Futbol} => {Calzado} significa que cuando compran Futbol también compran Calzado. El lado izquierdo de la regla recibe el nombre de antecedente (LHS), y el lado derecho, el nombre de consecuente (RHS).
 
 El porcentaje de confiabilidad es la probabilidad de que una transacción que contiene los items  X, también contengan los items de Y. Por ejemplo, la regla {INFANTIL} ⇒ {VESTIMENTA}, significa que el 10.8% de las veces que se llevaron productos de la sección ‘INFANTIL’ también se llevaron de la sección ‘VESTIMENTA'.
 
@@ -721,7 +724,7 @@ top.count <- sort(reglas, by = "count", decreasing = T)
 
 Las gráficas son una excelente manera de visualizar cómo los artículos se relacionan entre sí. Las reglas están representadas dentro los círculos y estos, a su vez, están conectados con sus artículos mediante flechas.
 
-Como se puede apreciar en la siguiente gráfica, las secciones 'VESTIMENTA', 'GIMNACIO' y 'CORRER', son el centro de múltiples relaciones con el resto de las secciones de la tienda.
+Como se puede apreciar en la siguiente gráfica, las secciones 'VESTIMENTA', 'GIMNASIO' y 'CORRER', son el centro de múltiples relaciones con el resto de las secciones de la tienda.
 
 ```{r, echo=F, include=T, fig.width=7, fig.height=5,warning=F, , out.width="100%"}
 support <- 50/dim(trans)[1]
@@ -739,9 +742,9 @@ support <- 50/dim(trans)[1]
 
 ### Solución 1
 
-Para conocer el layout mas eficiente para la tienda física utilizaremos el gráfico de reglas, de esta manera podemos visualizar las secciones que tienen relación entre si. 
+Para conocer el layout más eficiente para la tienda física utilizaremos el gráfico de reglas, de esta manera podemos visualizar las secciones que tienen relación entre sí. 
 
-Las secciones 'VESTIMENTA', 'GIMNACIO' y 'CORRER', son las secciones más populares al tener mayor número de reglas de asociación con el resto de las secciones. Por lo tanto, como podemos observar en la gráfica, las secciones 'FUTBOL', 'DEPORTE ACUATICO', y 'ACCESORIOS' tienen muy pocas asociaciones con todas las secciones de la tienda, además de solo presentar asociaciones con las secciones 'GIMNACIO' y 'CORRER', por lo que una estrategia sería no aislarlas tanto de las secciones más populares, y de esta menera incentivar la compra dentro de esas secciones menos populares a partir de la visita a las populares.
+Las secciones 'VESTIMENTA', 'GIMNASIO' y 'CORRER', son las más populares ya que tienen mayor númerp de reglas de asociación con el resto de las secciones. En cambio, las secciones 'FÚTBOL', 'DEPORTE ACUÁTICO', y 'ACCESORIOS' tienen muy pocas asociaciones con todas las secciones de la tienda. Debido a que solo presentan asociaciones con ‘GIMNASIO’ y ‘CORRER’, una estrategia sería no aislarlas tanto de las secciones más populares. De esta manera se incentivarían las compras dentro de las secciones menos populares a partir de las visitas a las más populares.
 
 ```{r, echo=F, include=T, fig.width=7, fig.height=7, warning=F, , out.width="100%"}
 support <- 10/dim(trans)[1]
