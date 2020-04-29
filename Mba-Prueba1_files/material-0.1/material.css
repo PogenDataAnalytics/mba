@@ -5,7 +5,7 @@
 }
 
 .header-panel {
-    background-color: #404041;
+    background-color: #2f5972;
     min-height: 144px;
     position: relative;
     z-index: 3;
@@ -92,7 +92,7 @@
 }
 
 .pages h1 {
-    color: #214865;
+    color: #1b3b52;
     /*font-size: 24px;*/
     /*font-weight: normal;*/
     /*margin-top: 5px;*/
@@ -174,7 +174,7 @@ pre > code {
 }
 
 .pages .nav-tabs>li.active>a {
-    background-color: #f04438 !important;
+    background-color: #1b3b52 !important;
 }
 
 
