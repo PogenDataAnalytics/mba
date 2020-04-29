@@ -4,7 +4,6 @@ output:
   rmdformats::material:
     highlight: kate
     self_contained: true
-    code_folding: show
     thumbnails: true
     gallery: true
     fig_width: 4
