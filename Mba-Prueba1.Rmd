@@ -3,7 +3,7 @@ title: "Pogen Analytics"
 output:
   rmdformats::material:
     highlight: kate
-    self_contained: true
+    self_contained: false
     thumbnails: true
     gallery: true
     fig_width: 4
@@ -118,7 +118,7 @@ La siguiente gráfica muestra la cantidad y el porcentaje (del total de artícul
         plot_ly(freq, x = reorder(freq$items, -freq$count), y = freq$count, type = "bar",
                 text = relativo, textposition = "outside", showlegend = F, name = " ",
                 cliponaxis = FALSE,
-                marker = list(color = "#235a79")) %>%
+                marker = list(color = "#53a0bc")) %>%
             layout(title = list(tittle = ""),
                    xaxis = list(title = "", tickangle = -45),
                    yaxis = list(title = "Número de artículos vendidos"))
@@ -144,7 +144,7 @@ Los tamaños de tickets de compra nos indican la medida en que los artículos so
         plot_ly(freq, x = reorder(freq$size, -freq$count), y = freq$count, type = "bar",
                 text = rela, textposition = "outside", showlegend = F, name = " ",
                 cliponaxis = FALSE,
-                marker = list(color = "#f04438")) %>%
+                marker = list(color = "#f4c24a")) %>%
             layout(title = "",
                    xaxis = list(title = "Número de artículos por ticket", tickangle = -45),
                    yaxis = list(title = "Número de tickets"))
@@ -393,7 +393,7 @@ La siguiente gráfica muestra la cantidad y el porcentaje (del total de artícul
         plot_ly(freq, x = reorder(freq$items, -freq$count), y = freq$count, type = "bar",
                 text = relativo, textposition = "outside", showlegend = F, name = " ",
                 cliponaxis = FALSE,
-                marker = list(color = "#235a79")) %>%
+                marker = list(color = "#53a0bc")) %>%
             layout(title = list(tittle = ""),
                    xaxis = list(title = "", tickangle = -45),
                    yaxis = list(title = "Número de artículos vendidos"))
@@ -419,7 +419,7 @@ Los tamaños de tickets de compra nos indican la medida en que los artículos so
         plot_ly(freq, x = reorder(freq$size, -freq$count), y = freq$count, type = "bar",
                 text = rela, textposition = "outside", showlegend = F, name = " ",
                 cliponaxis = FALSE,
-                marker = list(color = "#f04438")) %>%
+                marker = list(color = "#f4c24a")) %>%
             layout(title = "",
                    xaxis = list(title = "Número de artículos por ticket", tickangle = -45),
                    yaxis = list(title = "Número de tickets"))
@@ -642,7 +642,7 @@ La siguiente gráfica muestra la cantidad y el porcentaje (del total de artícul
         plot_ly(freq, x = reorder(freq$items, -freq$count), y = freq$count, type = "bar",
                 text = relativo, textposition = "outside", showlegend = F, name = " ",
                 cliponaxis = FALSE,
-                marker = list(color = "#235a79")) %>%
+                marker = list(color = "#53a0bc")) %>%
             layout(title = list(tittle = ""),
                    xaxis = list(title = "", tickangle = -45),
                    yaxis = list(title = "Número de artículos vendidos"))
@@ -668,7 +668,7 @@ Los tamaños de tickets de compra nos indican la medida en que los artículos so
         plot_ly(freq, x = reorder(freq$size, -freq$count), y = freq$count, type = "bar",
                 text = rela, textposition = "outside", showlegend = F, name = " ",
                 cliponaxis = FALSE,
-                marker = list(color = "#f04438")) %>%
+                marker = list(color = "#fac24a")) %>%
             layout(title = "",
                    xaxis = list(title = "Número de tickets", tickangle = -45),
                    yaxis = list(title = "Número de artículos por ticket"))
