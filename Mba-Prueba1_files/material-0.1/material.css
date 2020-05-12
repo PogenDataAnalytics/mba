@@ -5,7 +5,7 @@
 }
 
 .header-panel {
-    background-color: #2f5972;
+    background-color: #ffffff;
     min-height: 144px;
     position: relative;
     z-index: 3;
@@ -66,8 +66,9 @@
 }
 
 .menu ul li.active {
-    background-color: #dedede;
+    background-color: #cccccc;
     position: relative;
+    font-weight: bold;
 }
 
 .menu ul li a {
@@ -92,9 +93,9 @@
 }
 
 .pages h1 {
-    color: #1b3b52;
+    color: #000;
     /*font-size: 24px;*/
-    /*font-weight: normal;*/
+    font-weight: bold;
     /*margin-top: 5px;*/
     /*margin-bottom: 60px;*/
     /*letter-spacing: 1.20000004768372px;*/
@@ -174,7 +175,7 @@ pre > code {
 }
 
 .pages .nav-tabs>li.active>a {
-    background-color: #1b3b52 !important;
+    background-color: #fd1f18 !important;
 }
 
 
