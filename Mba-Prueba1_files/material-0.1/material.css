@@ -22,7 +22,7 @@
 .header-panel h1 {
     color: #FFF;
     font-size: 28px;
-    padding-left: 35px;
+    padding-left: 30px;
 }
 
 .header-panel h4 {
@@ -54,7 +54,7 @@
 
 .menu ul {
     padding: 0;
-    margin: 7px 0;
+    margin: 10px 0;
 }
 
 .menu ul li {
@@ -89,15 +89,15 @@
 .pages > div {
     padding: 0 5px;
     padding-top: 64px;
-    margin: 0;
+    margin: 10px;
 }
 
 .pages h1 {
     color: #000;
-    /*font-size: 24px;*/
+    font-size: 28px;
     font-weight: bold;
-    /*margin-top: 5px;*/
-    /*margin-bottom: 60px;*/
+    margin-top: 5px;
+    margin-bottom: 5px;
     /*letter-spacing: 1.20000004768372px;*/
 }
 
@@ -106,7 +106,7 @@
     transition: transform 0 linear;
     visibility: hidden;
     opacity: 0;
-    font-size: 16px;
+    font-size: 14px;
     margin-left: 1em;
 }
 
@@ -190,7 +190,7 @@ table {
 }
 
 h2, h3, h4 {
-    margin: 1em 0 0.5em 0;
+    margin: 0em 0 .5em 0;
 }
 
 /* Images */
@@ -202,7 +202,7 @@ h2, h3, h4 {
 
 .figure {
     margin: 1em 0 2em 0;
-    display: table;
+    /*display: table;*/
 }
 
 img.image-thumb {
