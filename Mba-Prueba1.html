@@ -109,11 +109,21 @@ $(document).ready(function () {
 <p><strong>Pogen Analytics</strong> pone a tu disposición los siguientes casos para que conozcas los beneficios que nuestra plataforma de Market Basket Analysis puede traer a tu negocio:</p>
 <ul>
 <li>Caso 1: Supermercado</li>
+<img src="Mba-Prueba1_files/imagenes/ezgif-3-ccc0f53b437e.png" width="210" align="right">
 <li>Caso 2: Zapatería</li>
 <li>Caso 3: Tienda Departamental</li>
 </ul>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
 </div>
 </div>
+
 <div id="caso-1" class="section level1">
 <h1>Caso 1</h1>
 <div id="supermercado-intermarché" class="section level2 tabset">
@@ -292,9 +302,19 @@ $(document).ready(function () {
 <h1><strong>Contáctanos</strong></h1>
 <p>Si tienes dudas, o quieres analizar los datos de tu propio negocio, ponte en contacto con nosotros.</p>
 <p><em>Pavel Medina-Ruiz</em></p>
+<img src="Mba-Prueba1_files/imagenes/ezgif-5-ba38e21e8983.png" width="210" align="right">
 <p><em>Líder de Analítica de datos</em></p>
 <p><em><a href="mailto:pavel.medina@pogen.com" class="email">pavel.medina@pogen.com</a></em></p>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
 </div>
+
 
     </div>
     <div class="col-xs-2">
@@ -309,43 +329,8 @@ $(document).ready(function () {
 <script>
 $(document).ready(function () {
   // add bootstrap table styles to pandoc tables
-  $('tr.header').parent('thead').parent('table').addClass('table table-striped table-hover');
-
-    var images = $('.pages img');
-  images.filter(function() {
-      if ($(this).parent().attr("class") == "figure") {
-          return(false)
-      } else {
-          return(true);
-      }
-  }).wrap("<div class='figure'></div>");
-  images.addClass("image-thumb").wrap("<div class='panel-body'></div>");
-  $('.figure p.caption').wrap("<div class='panel-footer'></div>");
-  $('.figure').addClass('panel panel-default');
   
-    $('.pages img')
- 	  .addClass("image-lb");
-  $('.pages').magnificPopup({
-	      type:'image',
-	      closeOnContentClick: false,
-	      closeBtnInside: false,
-        delegate: 'img',
-	      gallery: {enabled: true },
-          removalDelay: 500,
-          callbacks: {
-              beforeOpen: function() {
-                // just a hack that adds mfp-anim class to markup
-                this.st.image.markup = this.st.image.markup.replace('mfp-figure', 'mfp-figure mfp-with-anim');
-              }
-          },
-          mainClass: 'mfp-move-from-top',
-	      image: {
-	        verticalFit: true,
-            titleSrc: 'alt'
-	      }
- 	    });
- 	
-    
+  $('tr.header').parent('thead').parent('table').addClass('table table-striped table-hover');
     $('#toc ul li').first().addClass("active");
     $('#toc ul li').attr("data-target", function() {
         return($(this).children("a").attr("href"));
